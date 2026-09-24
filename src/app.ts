@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import {config} from "./lib/config";
 import {logger} from "./lib/logger";
 import {globalErrorHandler} from "./middleware/errorHandler.middleware";
+import {NotFoundError} from "./errors/http.error";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
 
@@ -26,12 +27,16 @@ app.get("/health", (req, res) => {
     res.json({
         status: "OK",
         timestamp: new Date().toISOString(),
-        environment: config.NODE_ENV,
+        environment: config.env,
     })
 })
 
 app.use("/api/v1/auth", authRoutes)
 app.use("/api/v1/users", userRoutes);
+
+app.use((req, res, next) => {
+    next(new NotFoundError(`Cannot ${req.method} ${req.originalUrl}`));
+});
 
 app.use(globalErrorHandler);
 

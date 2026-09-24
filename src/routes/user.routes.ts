@@ -11,7 +11,7 @@ const userController = container.resolve(UserController);
 
 router.get(
     "/:id",
-    authenticate,
+    // authenticate,
     Serialize(UserResponse),
     userController.getUser
 )

@@ -8,13 +8,9 @@ export class UserResponse {
     @Expose() name!: string;
     @Expose() createdAt!: Date;
 
-    @Exclude({toPlainOnly: true})
-    role?: {name: string} | null;
-
     @Expose()
-    get roleName(): string | null {
-        return this.role?.name ?? null;
-    }
+    roles?: string[];
+
 
 
 

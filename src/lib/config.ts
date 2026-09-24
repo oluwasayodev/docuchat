@@ -1,34 +1,193 @@
+import "reflect-metadata";
 import dotenv from "dotenv";
-import {z} from "zod";
-
+import {Expose, plainToInstance, Type} from "class-transformer";
+import {IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min, MinLength, validateSync} from "class-validator";
 
 
 dotenv.config()
 
-const envSchema = z.object({
-    NODE_ENV: z.enum(["production", "development", "test"])
-        .default("development"),
-
-    PORT: z.coerce.number().default(4000),
-    DATABASE_URL: z.string().optional(),
-    JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
-    JWT_EXPIRES_IN: z.string().default("15 M"),
-    REFRESH_TOKEN_EXPIRES_IN: z.string().default("7d"),
-    OPENAI_API_KEY: z.string().optional(),
-    REDIS_URL: z.string().optional(),
-    BCRYPT_SALT_ROUNDS: z.coerce.number()
-
-})
-
-
-const parsedEnv = envSchema.safeParse(process.env);
-
-if (!parsedEnv.success) {
-    console.error("Invalid environment variables");
-    // console.error(parsedEnv.error.format());
-    console.error(z.treeifyError(parsedEnv.error));
-    process.exit(1);
+export enum NodeEnv {
+    PRODUCTION = "production",
+    DEVELOPMENT = "development",
+    TEST = "test",
+    QA  = 'qa'
 }
 
-export const config = parsedEnv.data;
+export class AppConfig {
 
+    @Expose({name: "NODE_ENV"})
+    @IsEnum(NodeEnv)
+    @IsOptional()
+    readonly env: NodeEnv = NodeEnv.DEVELOPMENT;
+
+    @Expose({name: "PORT"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(3000)
+    @Max(65535)
+    @IsOptional()
+    readonly port: number = 4000;
+
+    @Expose({name: "DATABASE_URL"})
+    @IsString()
+    @IsOptional()
+    readonly databaseUrl?: string;
+
+    @Expose({name: "JWT_SECRET"})
+    @IsString()
+    @MinLength(1, {message: "JWT_SECRET is required"})
+    readonly jwtSecret!: string;
+
+    @Expose({name: "JWT_EXPIRES_IN"})
+    @IsString()
+    @IsOptional()
+    readonly jwtExpiresIn: string = "15m";
+
+    @Expose({name: "REFRESH_TOKEN_EXPIRES_IN"})
+    @IsString()
+    @IsOptional()
+    readonly refreshTokenExpiresIn: string = "7d";
+
+    @Expose({name: "OPENAI_API_KEY"})
+    @IsString()
+    @IsOptional()
+    readonly openaiApiKey?: string;
+
+    @Expose({name: "REDIS_URL"})
+    @IsString()
+    @IsOptional()
+    readonly redisUrl?: string;
+
+    @Expose({name: "APP_URL"})
+    @IsString()
+    @IsOptional()
+    readonly appUrl?: string;
+
+    @Expose({name: "BCRYPT_SALT_ROUNDS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(4)
+    @Max(15)
+    @IsOptional()
+    readonly bcryptSaltRounds: number = 12;
+
+    @Expose({name: "LOGGER_DRIVER"})
+    @IsEnum(["pino", "winston"])
+    @IsOptional()
+    readonly loggerDriver: "pino" | "winston" = "pino";
+
+    @Expose({name: "LOG_LEVEL"})
+    @IsString()
+    @IsOptional()
+    readonly logLevel: string = "info";
+
+    @Expose({name: "EVENTBUS_DRIVER"})
+    @IsEnum(["in-memory", "kafka"])
+    @IsOptional()
+    readonly eventBusDriver: "in-memory" | "kafka" = "in-memory";
+
+    @Expose({name: "STORAGE_DRIVER"})
+    @IsEnum(["local", "s3", "minio"])
+    @IsOptional()
+    readonly storageDriver: "local" | "s3" | "minio" = "local";
+
+    @Expose({name: "CLIENT_URL"})
+    @IsString()
+    @IsOptional()
+    readonly clientUrl?: string;
+
+    @Expose({name: "LOCAL_STORAGE_DIR"})
+    @IsString()
+    @IsOptional()
+    readonly localStorageDir: string = "uploads";
+
+    @Expose({name: "GOOGLE_CLIENT_ID"})
+    @IsString()
+    @IsOptional()
+    readonly googleClientId?: string;
+
+    @Expose({name: "COGNITO_USER_POOL_ID"})
+    @IsString()
+    @IsOptional()
+    readonly cognitoUserPoolId?: string;
+
+    @Expose({name: "COGNITO_CLIENT_ID"})
+    @IsString()
+    @IsOptional()
+    readonly cognitoClientId?: string;
+
+    @Expose({name: "S3_BUCKET"})
+    @IsString()
+    @IsOptional()
+    readonly s3Bucket: string = "docuchat";
+
+    @Expose({name: "AWS_REGION"})
+    @IsString()
+    @IsOptional()
+    readonly awsRegion: string = "us-east-1";
+
+    @Expose({name: "AWS_ACCESS_KEY_ID"})
+    @IsString()
+    @IsOptional()
+    readonly awsAccessKeyId: string = "minioadmin";
+
+    @Expose({name: "AWS_SECRET_ACCESS_KEY"})
+    @IsString()
+    @IsOptional()
+    readonly awsSecretAccessKey: string = "minioadmin";
+
+    @Expose({name: "S3_ENDPOINT"})
+    @IsString()
+    @IsOptional()
+    readonly s3Endpoint?: string;
+
+    @Expose({name: "S3_FORCE_PATH_STYLE"})
+    @Type(() => Boolean)
+    @IsBoolean()
+    @IsOptional()
+    readonly s3ForcePathStyle: boolean = false;
+
+    @Expose({name: "KAFKA_BROKER"})
+    @IsString()
+    @IsOptional()
+    readonly kafkaBroker: string = "localhost:9092";
+
+    @Expose({name: "KAFKA_CLIENT_ID"})
+    @IsString()
+    @IsOptional()
+    readonly kafkaClientId: string = "docuchat-client";
+
+    @Expose({name: "KAFKA_CONSUMER_GROUP"})
+    @IsString()
+    @IsOptional()
+    readonly kafkaConsumerGroup: string = "docuchat-consumer-group";
+
+    @Expose({name: "CACHE_DRIVER"})
+    @IsEnum(["in-memory", "redis"])
+    @IsOptional()
+    readonly cacheDriver: "in-memory" | "redis" = "in-memory";
+
+    get isProduction(): boolean {
+        return this.env === NodeEnv.PRODUCTION;
+    }
+
+    get baseUrl(): string {
+        return this.appUrl || `http://localhost:${this.port}`;
+    }
+
+    static load(): AppConfig {
+        const config = plainToInstance(AppConfig, process.env, {exposeDefaultValues: true});
+        const errors = validateSync(config, {whitelist: true});
+
+        if (errors.length > 0) {
+            console.error("Invalid environment variables");
+            for (const err of errors) {
+                console.error(`  - ${err.property}: ${Object.values(err.constraints ?? {}).join(", ")}`);
+            }
+            process.exit(1);
+        }
+        return config;
+    }
+}
+
+export const config = AppConfig.load();

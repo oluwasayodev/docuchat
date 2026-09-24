@@ -3,7 +3,7 @@ import {config} from "./config";
 import {Pool} from "pg";
 import {PrismaPg} from "@prisma/adapter-pg";
 
-const connectionString = config.DATABASE_URL;
+const connectionString = config.databaseUrl;
 
 const pool = new Pool({connectionString});
 const adapter = new PrismaPg(pool);

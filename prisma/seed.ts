@@ -27,34 +27,52 @@ const ROLES: Role[] = [
 ]
 
 
+type PermissionKey = {
+    resource: string;
+    action: string;
+}
+
+function parsePermission(permission: string): PermissionKey {
+    const [resource, action] = permission.split(":");
+    return {resource, action};
+}
+
+
 async function main() {
     logger.info("Seeding database...");
 
-    for(const action of Object.values(PERMISSIONS)) {
+    for(const permission of Object.values(PERMISSIONS)) {
+        const {resource, action} = parsePermission(permission);
         await prisma.permission.upsert({
-            where: { action },
-            create: {action},
+            where: {resource_action: {resource, action}},
+            create: {resource, action},
             update: {}
         })
     }
 
+    const existingPermissions = await prisma.permission.findMany({
+        select: {id: true, resource: true, action: true}
+    });
+    const permissionIdByKey = new Map(
+        existingPermissions.map(p => [`${p.resource}:${p.action}`, p.id])
+    );
 
     for (const role of ROLES) {
-        await prisma.role.upsert({
+        const upsertedRole = await prisma.role.upsert({
             where: {name: role.name},
-            update: {
-                description: role.description,
-                permissions: {
-                    connect: role.permissions.map(action => ({action}))
-                }
-            },
+            update: {description: role.description},
             create: {
                 name: role.name,
                 description: role.description,
-                permissions: {
-                    connect: role.permissions.map(action => ({action}))
-                }
             }
+        })
+
+        await prisma.rolePermission.createMany({
+            data: role.permissions.map(permission => ({
+                roleId: upsertedRole.id,
+                permissionId: permissionIdByKey.get(permission)!,
+            })),
+            skipDuplicates: true,
         })
     }
     logger.info("Seeding completed");

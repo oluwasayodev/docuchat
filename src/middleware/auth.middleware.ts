@@ -14,7 +14,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
     try {
         const token = authHeader.split(" ")[1];
-        req.user = jwt.verify(token, config.JWT_SECRET) as UserTokenPayload;
+        req.user = jwt.verify(token, config.jwtSecret) as UserTokenPayload;
         next();
     } catch (error) {
         throw new UnauthorizedException("Invalid or expired token");

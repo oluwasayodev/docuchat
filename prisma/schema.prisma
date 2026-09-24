@@ -6,13 +6,19 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AuthProviderType {
+  LOCAL
+  GOOGLE
+  COGNITO
+}
+
 model User {
   id            String         @id @default(uuid())
   name          String
   email         String         @unique
-  passwordHash  String
-  roleId        String
-  role          Role           @relation(fields: [roleId], references: [id])
+  passwordHash  String?
+  roles         UserRole[]
+  identities    UserIdentity[]
   refreshTokens RefreshToken[]
   tier          String         @default("free")
   isActive      Boolean        @default(true)
@@ -38,26 +44,29 @@ model ChatDocument {
 }
 
 model Role {
-  id          String       @id @default(uuid())
-  name        String       @unique
+  id          String           @id @default(uuid())
+  name        String           @unique
   description String?
-  users       User[]
-  permissions Permission[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  users       UserRole[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   deletedAt   DateTime?
 
   @@map("roles")
 }
 
 model Permission {
-  id        String    @id @default(uuid())
-  action    String    @unique
-  roles     Role[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String           @id @default(uuid())
+  action    String           @unique
+  resource  String
+  roles     RolePermission[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
   deletedAt DateTime?
 
+  @@unique([resource, action])
+  @@index([resource])
   @@map("permissions")
 }
 
@@ -72,4 +81,41 @@ model RefreshToken {
   deletedAt DateTime?
 
   @@map("refresh_tokens")
+}
+
+model UserIdentity {
+  id         String           @id @default(uuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider   AuthProviderType
+  providerId String
+  createdAt  DateTime         @default(now())
+
+  @@unique([provider, providerId])
+  @@map("user_identities")
+}
+
+model UserRole {
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+  assignedBy String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  assignedAt   DateTime @default(now())
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], onDelete: Cascade, references: [id])
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
 }

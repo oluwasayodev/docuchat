@@ -3,8 +3,8 @@ import {config} from "./config";
 
 
 export const logger = pino({
-    level: config.NODE_ENV === 'production' ? 'info' : 'debug',
-    transport: config.NODE_ENV !== 'production' ?
+    level: config.env === 'production' ? 'info' : 'debug',
+    transport: config.env !== 'production' ?
         {
             target: 'pino-pretty',
             options: {

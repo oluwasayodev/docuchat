@@ -1,5 +1,5 @@
 import {User} from "@prisma/client";
-import {LoginRequest, RefreshTokenRequest, RegisterRequest} from "../dtos/auth.dto";
+import {LoginRequest, RefreshTokenRequest, RegisterRequest, SocialLoginRequest} from "../dtos/auth.dto";
 
 
 export type AuthTokens = {
@@ -14,4 +14,5 @@ export interface IAuthService {
     login(dto: LoginRequest): Promise<AuthTokens>;
     refreshToken(dto: RefreshTokenRequest): Promise<AuthTokens>;
     logout(refreshToken: string): Promise<void>;
+    socialLogin(dto: SocialLoginRequest): Promise<AuthTokens>;
 }

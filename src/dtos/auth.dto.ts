@@ -1,6 +1,7 @@
 import {IsEmail, IsNotEmpty, IsOptional, IsString, MinLength} from "class-validator";
 import {Exclude, Expose, Type} from "class-transformer";
 import {UserResponse} from "./user.dto";
+import {AuthProviderType} from "@prisma/client";
 
 
 export class RegisterRequest {
@@ -44,3 +45,28 @@ export class RefreshTokenRequest {
     @IsNotEmpty()
     refreshToken!: string;
 }
+
+export class AuthTokenResponse {
+    accessToken!: string;
+    refreshToken!: string;
+    user!: UserResponse;
+}
+
+export class SocialLoginRequest {
+    provider!: AuthProviderType;
+    idToken!: string;
+}
+
+export class SetPasswordRequest {
+    newPassword!: string;
+}
+
+export class ResetPasswordRequest {
+    token!: string;
+    newPassword!: string;
+}
+
+export class RequestResetPasswordRequest {
+    email!: string;
+}
+

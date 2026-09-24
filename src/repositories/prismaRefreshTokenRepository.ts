@@ -14,16 +14,22 @@ export class PrismaRefreshTokenRepository implements IRefreshTokenRepository {
     }
 
     async deleteByToken(hashedToken: string): Promise<void> {
-        await this.prisma.refreshToken.update({
-            where: {token: hashedToken},
+        await this.prisma.refreshToken.updateMany({
+            where: {token: hashedToken, deletedAt: null},
             data: { deletedAt: new Date()}
         });
     }
 
     async findByToken(hashedToken: string): Promise<RefreshToken | null> {
-        return this.prisma.refreshToken.findUnique({where: {token: hashedToken}})
+        return this.prisma.refreshToken.findFirst({where: {token: hashedToken, deletedAt: null}})
 
     }
+
+    async deleteAllForUser(userId: string): Promise<void> {
+        await this.prisma.refreshToken.updateMany({where: { userId, deletedAt: null }, data: {deletedAt: new Date()}});
+    }
+
+
 
 
 }
