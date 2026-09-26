@@ -9,11 +9,11 @@ export class UserResponse {
     @Expose() createdAt!: Date;
 
     @Expose()
+    @Transform(({value}) =>
+        Array.isArray(value)
+            ? value.map((item: any) => (typeof item === "string" ? item: item?.role?.name)).filter(Boolean)
+            : [value]
+    )
     roles?: string[];
-
-
-
-
-
 
 }

@@ -1,6 +1,11 @@
+import {Controller} from "tsoa";
+import {injectable} from "tsyringe";
 
 
-export class DocumentController {
+@injectable()
+export class DocumentController extends Controller{
 
-
+    constructor() {
+        super();
+    }
 }

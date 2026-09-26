@@ -22,6 +22,10 @@ import {loggerFactory} from "./logging/logger.factory";
 import {cacheFactory} from "./cache/cache.factory";
 import {ICacheService} from "./cache/cacheService.interface";
 import {AppConfig, config} from "./lib/config";
+import {IJobQueue} from "./queues/jobQueue.interface";
+import {BullMQJobQueue} from "./queues/bullMQJobQueue";
+import {IWorker} from "./workers/worker.interface";
+import {workerFactory} from "./workers/worker.factory";
 
 
 container.register("IAuthProvider", {useClass: GoogleAuthProvider})
@@ -45,4 +49,9 @@ container.register<IStorageService>("IStorageService", {
 container.register<ILogger>("ILogger", {useFactory: loggerFactory});
 container.register<ICacheService>("ICacheService", {useFactory: cacheFactory});
 container.register(AppConfig, {useValue: config});
+
+
+container.register<IJobQueue>("IJobQueue", {useClass: BullMQJobQueue})
+container.register<IWorker>("IWorker", {useFactory: workerFactory});
+
 export {container};

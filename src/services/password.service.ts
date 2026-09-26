@@ -9,6 +9,8 @@ import {AppConfig} from "../lib/config";
 import jwt from "jsonwebtoken";
 import {BadRequestException, ConflictException, NotFoundError} from "../errors/http.error";
 import bcrypt from "bcryptjs";
+import {QUEUE_JOBS, QUEUE_NAMES, QUEUES} from "../queues/queue.constants";
+import {IJobQueue} from "../queues/jobQueue.interface";
 
 
 
@@ -21,6 +23,7 @@ export class PasswordService implements IPasswordService {
         @inject("IRefreshTokenRepository") private refreshTokenRepository: IRefreshTokenRepository,
         @inject("ILogger") private logger: ILogger,
         @inject("ICacheService") private cache: ICacheService,
+        @inject("IJobQueue") private jobQueue: IJobQueue,
         @inject(AppConfig) private appConfig: AppConfig,
     ) {}
 
@@ -37,12 +40,10 @@ export class PasswordService implements IPasswordService {
         const resetLink = `${this.appConfig.clientUrl ?? `http://localhost:${this.appConfig.port}`}/reset-password?token=${resetToken}`;
 
         // add queue
-        // await this.queue.addJob(
-        //     "queue-name",
-        //     "send-password-reset-email",
-        //     {to: user.email, name: user.name, resetLink},
-        //     {attempts: 3, backoff: {type: 'exponential', delay: 2000}}
-        // )
+        await this.jobQueue.addJob(
+            QUEUES.EMAIL.jobs.SEND_PASSWORD_RESET_EMAIL,
+            {to: user.email, name: user.name, resetLink},
+        )
 
         this.logger.info("Password reset email job enqueued successfully", {userId: user.id})
 

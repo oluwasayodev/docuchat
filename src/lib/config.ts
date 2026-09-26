@@ -71,6 +71,47 @@ export class AppConfig {
     @IsOptional()
     readonly bcryptSaltRounds: number = 12;
 
+    @Expose({name: "QUEUE_URL"})
+    @IsString()
+    @IsOptional()
+    readonly queueUrl: string = "redis://127.0.0.1:6379"
+
+    @Expose({name: "QUEUE_ATTEMPTS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly queueAttempts: number = 3;
+
+    @Expose({name: "QUEUE_CONCURRENCY"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly queueConcurrency: number = 5;
+
+    @Expose({name: "WORKER_DRIVER"})
+    @IsEnum(["bullmq"])
+    @IsOptional()
+    readonly workerDriver: "bullmq" = "bullmq"
+
+    @Expose({name: "BULL_BOARD_USERNAME"})
+    @IsString()
+    @IsOptional()
+    readonly bullBoardUsername: string = "admin"
+
+    @Expose({name: "BULL_BOARD_PATH"})
+    @IsString()
+    @IsOptional()
+    readonly bullBoardPath: string = "/admin/queues"
+
+    @Expose({name: "BULL_BOARD_PASSWORD"})
+    @IsString()
+    @IsOptional()
+    readonly bullBoardPassword: string = "admin";
+
+
+
     @Expose({name: "LOGGER_DRIVER"})
     @IsEnum(["pino", "winston"])
     @IsOptional()

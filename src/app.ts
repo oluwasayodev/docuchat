@@ -1,13 +1,16 @@
 import 'reflect-metadata';
-import express from 'express';
+import express, {Router} from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import {config} from "./lib/config";
 import {logger} from "./lib/logger";
 import {globalErrorHandler} from "./middleware/errorHandler.middleware";
 import {NotFoundError} from "./errors/http.error";
-import userRoutes from "./routes/user.routes";
-import authRoutes from "./routes/auth.routes";
+import {RegisterRoutes} from "./routes/routes";
+import {basicAuthMiddleware} from "./middleware/basicAuth.middleware";
+import {getBullBoardRouter} from "./queues/bullBoard.setup";
+import swaggerUi from "swagger-ui-express";
+import swaggerDoc from './generated/swagger.json';
 
 
 export const app = express();
@@ -17,6 +20,12 @@ app.use(cors())
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const apiRouter = Router();
+RegisterRoutes(apiRouter);
+
+app.use("/api/v1", apiRouter);
+app.use(config.bullBoardPath, basicAuthMiddleware, getBullBoardRouter())
 
 
 
@@ -31,8 +40,9 @@ app.get("/health", (req, res) => {
     })
 })
 
-app.use("/api/v1/auth", authRoutes)
-app.use("/api/v1/users", userRoutes);
+if (config.env !== "production") {
+    app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+}
 
 app.use((req, res, next) => {
     next(new NotFoundError(`Cannot ${req.method} ${req.originalUrl}`));

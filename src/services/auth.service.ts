@@ -14,6 +14,7 @@ import {IEventBus} from "../events/eventBus.interface";
 import {ICacheService} from "../cache/cacheService.interface";
 import {ILogger} from "../logging/logger.interface";
 import {IRoleRepository} from "../repositories/roleRepository";
+import {ROLES} from "../constants/roles";
 
 
 
@@ -93,7 +94,7 @@ export class AuthService implements IAuthService {
         let roleId = dto.roleId;
 
         if (!dto.roleId){
-            const defaultRole = await this.roleRepository.findByName("USER");
+            const defaultRole = await this.roleRepository.findByName(ROLES.USER);
 
             if (!defaultRole) {
                 this.logger.error("System roles not initialized. Failed to resolve default role");
@@ -141,7 +142,7 @@ export class AuthService implements IAuthService {
                 user = existingUser;
             } else {
                 this.logger.info("Creating new user via social provisioning ", {email, provider: dto.provider});
-                const defaultRole = await this.roleRepository.findByName("USER");
+                const defaultRole = await this.roleRepository.findByName(ROLES.USER);
                 if (!defaultRole) throw new InternalServerError("System roles not initialized. Failed to resolve default role");
 
                 user = await this.userRepository.createUserWithRelations({

@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import {config} from "../lib/config";
 import {UserTokenPayload} from "../types/express";
 import {PermissionAction} from "../constants/permissions";
+import {RoleName, ROLES} from "../constants/roles";
 
 
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
@@ -21,9 +22,9 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
-export const hasRole = (...roles: string[]) => {
+export const hasRole = (...roles: RoleName[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        if (!req.user || !roles.includes(req.user.role)) {
+        if (!req.user || !req.user.roles.some(r => roles.includes(r))) {
             throw new ForbiddenException("Access denied");
         }
         next();
@@ -34,11 +35,12 @@ export const hasRole = (...roles: string[]) => {
 export const hasPermission = (...required: PermissionAction[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         if (!req.user) throw new UnauthorizedException("Access denied");
-        if (req.user.role === "SUPER_ADMIN") return next();
+        if (req.user.roles.includes(ROLES.SUPER_ADMIN)) return next();
 
         const userPermissions = new Set(req.user.permissions);
         if (!required.every(permission => userPermissions.has(permission))) {
             throw new ForbiddenException("Access denied: missing permission");
         }
+        next();
     }
 }

@@ -1,33 +1,56 @@
 import {inject, injectable} from "tsyringe";
 import {IAuthService} from "../services/authService.interface";
 import {Request, Response} from "express";
-import {RegisterRequest} from "../dtos/auth.dto";
+import {AuthResponse, LoginRequest, RefreshTokenRequest, RegisterRequest} from "../dtos/auth.dto";
+import {Body, Controller, Middlewares, Post, Route, Security, SuccessResponse, Tags} from "tsoa";
+import {Serialize} from "../middleware/serialize.middleware";
+import {hasRole} from "../middleware/auth.middleware";
+import {ROLES} from "../constants/roles";
 
 
 @injectable()
-export class AuthController {
+@Route("auth")
+@Tags("auth")
+export class AuthController extends Controller{
 
-    constructor(@inject("IAuthService") private authService: IAuthService) {}
-
-
-    register = async (req: Request, res: Response): Promise<void> => {
-        const result = await this.authService.register(req.body);
-        res.status(201).json(result);
+    constructor(@inject("IAuthService") private authService: IAuthService) {
+        super();
     }
 
-    login = async (req: Request, res: Response): Promise<void> => {
-        const result = await this.authService.login(req.body);
-        res.status(200).json(result);
+
+    @Post("/register")
+    @SuccessResponse("201", "Created")
+    @Middlewares(Serialize(AuthResponse))
+    async register(@Body() dto: RegisterRequest): Promise<AuthResponse> {
+        const result = await this.authService.register(dto);
+        return result as AuthResponse;
+
     }
 
-    refreshToken = async (req: Request, res: Response): Promise<void> => {
-        const result = await this.authService.refreshToken(req.body);
-        res.status(200).json(result);
+    @Post("/login")
+    @SuccessResponse("200", "OK")
+    @Middlewares(Serialize(AuthResponse))
+    async login(@Body() dto: LoginRequest): Promise<AuthResponse> {
+        const result = await this.authService.login(dto);
+        return result as AuthResponse;
     }
 
-    logout = async (req: Request, res: Response): Promise<void> => {
-        const result = await this.authService.logout(req.body.refreshToken);
-        res.status(204).json();
+    @Post("/token/refresh")
+    @SuccessResponse("200", "OK")
+    @Middlewares(Serialize(AuthResponse))
+    async refreshToken(@Body() dto: RefreshTokenRequest): Promise<AuthResponse> {
+        const result = await this.authService.refreshToken(dto);
+        return result as AuthResponse;
+
+    }
+
+
+    @Post("/logout")
+    @SuccessResponse("204", "No Content")
+    @Security("jwt")
+    @Middlewares(hasRole(ROLES.USER, ROLES.ADMIN, ROLES.SUPER_ADMIN))
+    async logout(@Body() dto: RefreshTokenRequest): Promise<void> {
+        await this.authService.logout(dto.refreshToken);
     }
 
 }

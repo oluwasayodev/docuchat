@@ -1,28 +1,34 @@
 import {PERMISSIONS} from "../src/constants/permissions";
 import {logger} from "../src/lib/logger";
 import {prisma} from "../src/lib/prisma";
+import {RoleName, ROLES} from "../src/constants/roles";
 
 
 
 
 type Role = {
-    name: string;
+    name: RoleName;
     description: string;
     permissions: string[];
 }
 
-const ROLES: Role[] = [
+const SYSTEM_ROLES: Role[] = [
     {
-        name: "USER",
+        name: ROLES.USER,
         description: "Standard system user",
         permissions: [
             PERMISSIONS.USERS_READ
         ]
     },
     {
-        name: "SUPER_ADMIN",
+        name: ROLES.SUPER_ADMIN,
         description: "Full system administrator",
         permissions: Object.values(PERMISSIONS)
+    },
+    {
+        name: ROLES.ADMIN,
+        description: "Administrator with user management",
+        permissions: [PERMISSIONS.USERS_READ, PERMISSIONS.USERS_WRITE, PERMISSIONS.USERS_UPDATE],
     }
 ]
 
@@ -57,7 +63,7 @@ async function main() {
         existingPermissions.map(p => [`${p.resource}:${p.action}`, p.id])
     );
 
-    for (const role of ROLES) {
+    for (const role of SYSTEM_ROLES) {
         const upsertedRole = await prisma.role.upsert({
             where: {name: role.name},
             update: {description: role.description},
