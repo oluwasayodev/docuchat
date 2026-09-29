@@ -1,4 +1,3 @@
-import {IBaseRepository} from "./baseRepository.interface";
 import {IRefreshTokenRepository} from "./refreshTokenRepository.interface";
 import {PrismaClient, RefreshToken} from "@prisma/client";
 import {inject, injectable} from "tsyringe";
@@ -28,8 +27,5 @@ export class PrismaRefreshTokenRepository implements IRefreshTokenRepository {
     async deleteAllForUser(userId: string): Promise<void> {
         await this.prisma.refreshToken.updateMany({where: { userId, deletedAt: null }, data: {deletedAt: new Date()}});
     }
-
-
-
 
 }

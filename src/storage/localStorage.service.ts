@@ -8,8 +8,8 @@ import * as fs from "fs";
 @singleton()
 export class LocalStorageService implements IStorageService {
 
-    private uploadDir: string;
-    private baseUrl: string;
+    private readonly uploadDir: string;
+    private readonly baseUrl: string;
 
     constructor(@inject(AppConfig) private appConfig: AppConfig) {
         this.uploadDir= path.resolve(process.cwd(), this.appConfig.localStorageDir);
@@ -45,7 +45,7 @@ export class LocalStorageService implements IStorageService {
 
     async upload({key, body}: UploadFileOptions): Promise<UploadResult> {
         const filePath = path.join(this.uploadDir, key);
-        fs.mkdirSync(filePath, { recursive: true });
+        fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
         const buffer = Buffer.isBuffer(body) ? body : Buffer.from(body);
         fs.writeFileSync(filePath, buffer);

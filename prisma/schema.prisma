@@ -12,6 +12,13 @@ enum AuthProviderType {
   COGNITO
 }
 
+enum DocumentStatus {
+  UPLOADED
+  PROCESSING
+  READY
+  FAILED
+}
+
 model User {
   id            String         @id @default(uuid())
   name          String
@@ -20,6 +27,8 @@ model User {
   roles         UserRole[]
   identities    UserIdentity[]
   refreshTokens RefreshToken[]
+  documents     ChatDocument[]
+  usageLogs     UsageLog[]
   tier          String         @default("free")
   isActive      Boolean        @default(true)
   createdAt     DateTime       @default(now())
@@ -31,16 +40,58 @@ model User {
 }
 
 model ChatDocument {
-  id          String    @id @default(uuid())
-  name        String
-  description String
-  pages       Int
-  fileUrl     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  id              String          @id @default(uuid())
+  userId          String
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  storageKey      String
+  mimeType        String
+  sizeBytes       Int
+  status          DocumentStatus  @default(UPLOADED)
+  processingError String?
+  pageCount       Int?
+  chunkCount      Int             @default(0)
+  processedAt     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
+  deletedBy       String?
+  documentChunks  DocumentChunk[]
 
+  @@index([userId, deletedAt, createdAt])
+  @@index([userId, status])
   @@map("chat_documents")
+}
+
+model DocumentChunk {
+  id         String       @id @default(uuid())
+  documentId String
+  document   ChatDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  index      Int
+  content    String
+  tokenCount Int          @default(0)
+  metadata   Json?
+  createdAt  DateTime     @default(now())
+
+  @@unique([documentId, index])
+  @@index([documentId])
+  @@map("document_chunks")
+}
+
+model UsageLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  tokens    Int      @default(0)
+  costUsd   Decimal? @db.Decimal(10, 6)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action])
+  @@map("usage_logs")
 }
 
 model Role {

@@ -26,6 +26,21 @@ import {IJobQueue} from "./queues/jobQueue.interface";
 import {BullMQJobQueue} from "./queues/bullMQJobQueue";
 import {IWorker} from "./workers/worker.interface";
 import {workerFactory} from "./workers/worker.factory";
+import {IDocumentRepository} from "./repositories/documentRepository.interface";
+import {PrismaDocumentRepository} from "./repositories/prismaDocumentRepository";
+import {IUsageLogRepository} from "./repositories/usageLogRepository.interface";
+import {PrismaUsageLogRepository} from "./repositories/prismaUsageLogRepository";
+import {TextDocumentParser} from "./services/parsers/textDocumentParser.service";
+import {PdfDocumentParser} from "./services/parsers/pdfDocumentParser";
+import {DocxDocumentParser} from "./services/parsers/docxDocumentParser";
+import {DocumentParserFactory} from "./services/parsers/documentParser.factory";
+import {IDocumentParsers} from "./services/parsers/documentParser.interface";
+import {DocumentChunker} from "./services/documentChunker";
+import {IDocumentChunker} from "./services/documentChunker.interface";
+import {IDocumentService} from "./services/documentService.interface";
+import {DocumentService} from "./services/document.service";
+import {IDocumentProcessingService} from "./services/documentProcessingService.interface";
+import {DocumentProcessingService} from "./services/documentProcessingService";
 
 
 container.register("IAuthProvider", {useClass: GoogleAuthProvider})
@@ -35,6 +50,8 @@ container.register("IAuthProvider", {useClass: CognitoAuthProvider})
 container.registerInstance(PrismaClient, prisma)
 container.registerSingleton<IUserRepository>("IUserRepository", PrismaUserRepository);
 container.registerSingleton<IRoleRepository>("IRoleRepository", RoleRepository);
+container.registerSingleton<IDocumentRepository>("IDocumentRepository", PrismaDocumentRepository);
+container.registerSingleton<IUsageLogRepository>("IUsageLogRepository", PrismaUsageLogRepository);
 container.registerSingleton<IRefreshTokenRepository>("IRefreshTokenRepository", PrismaRefreshTokenRepository);
 container.registerSingleton<IUserService>("IUserService", UserService);
 container.registerSingleton<IAuthService>("IAuthService", AuthService);
@@ -46,12 +63,19 @@ container.register<IStorageService>("IStorageService", {
     useFactory: storageFactory
 })
 
+container.registerSingleton("IDocumentParser", TextDocumentParser);
+container.registerSingleton("IDocumentParser", PdfDocumentParser);
+container.registerSingleton("IDocumentParser", DocxDocumentParser);
+container.register<IDocumentParsers>("IDocumentParsers", {useClass: DocumentParserFactory})
 container.register<ILogger>("ILogger", {useFactory: loggerFactory});
 container.register<ICacheService>("ICacheService", {useFactory: cacheFactory});
 container.register(AppConfig, {useValue: config});
+container.registerSingleton<IDocumentChunker>("IDocumentChunker", DocumentChunker);
 
 
 container.register<IJobQueue>("IJobQueue", {useClass: BullMQJobQueue})
 container.register<IWorker>("IWorker", {useFactory: workerFactory});
+container.register<IDocumentService>("IDocumentService", {useClass: DocumentService});
+container.register<IDocumentProcessingService>("IDocumentProcessingService", {useClass: DocumentProcessingService});
 
 export {container};

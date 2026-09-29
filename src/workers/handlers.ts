@@ -2,6 +2,7 @@ import {IWorker} from "./worker.interface";
 import {container} from "../container";
 import {ILogger} from "../logging/logger.interface";
 import {QUEUES} from "../queues/queue.constants";
+import {IDocumentProcessingService} from "../services/documentProcessingService.interface";
 
 
 export function registerJobHandlers(worker: IWorker): IWorker {
@@ -16,7 +17,9 @@ export function registerJobHandlers(worker: IWorker): IWorker {
             logger.info("Sending password reset email...", {payload: ctx.payload});
         })
         .register(QUEUES.DOCUMENTS.jobs.PROCESS_DOCUMENT, async (ctx) => {
-            logger.info("Processing document...", {payload: ctx.payload});
+            const processing = container.resolve("IDocumentProcessingService") as IDocumentProcessingService;
+            const { documentId } = ctx.payload as {documentId: string};
+            await processing.process(documentId);
         })
 
     return worker;

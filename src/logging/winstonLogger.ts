@@ -1,15 +1,13 @@
 import {ILogger} from "./logger.interface";
 import {inject, injectable} from "tsyringe";
 import winston from 'winston'
-import {Record} from "@prisma/client/runtime/client";
-import {metadata} from "reflect-metadata/no-conflict";
 import {AppConfig} from "../lib/config";
 
 
 @injectable()
 export class WinstonLogger implements ILogger {
     private logger: winston.Logger;
-    private appConfig: AppConfig;
+    private readonly appConfig: AppConfig;
 
     constructor(@inject(AppConfig) appConfig: AppConfig, loggerInstance?: winston.Logger) {
         this.appConfig = appConfig;

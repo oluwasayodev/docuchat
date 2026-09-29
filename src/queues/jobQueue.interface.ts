@@ -1,4 +1,4 @@
-import {QueueJobRef, QueueName} from "./queue.constants";
+import {QueueName, QUEUES} from "./queue.constants";
 
 export interface JobsOptions {
     jobId?: string;
@@ -13,7 +13,32 @@ export interface QueuedJob {
     id?: string;
 }
 
+export interface JobPayloadMap {
+    "send-welcome-email": {userId: string; email: string};
+    "send-password-reset-email": {to: string; name: string; resetLink: string};
+    "process-document": {documentId: string};
+    "retry-exhausted": {
+        originalQueue: string;
+        originalJobName: string;
+        originalJobId: string | undefined;
+        payload: unknown;
+        error: string;
+    }
+}
+
+
+
+export type JobRef<K extends keyof JobPayloadMap & string> = {
+    queue: QueueName,
+    name: K
+}
+
+
 
 export interface IJobQueue {
-    addJob(jobRef: QueueJobRef, payload: unknown, options?: JobsOptions): Promise<void>;
+    addJob<K extends keyof JobPayloadMap & string>(
+        jobRef: JobRef<K>,
+        payload: JobPayloadMap[K],
+        options?: JobsOptions
+    ): Promise<void>;
 }

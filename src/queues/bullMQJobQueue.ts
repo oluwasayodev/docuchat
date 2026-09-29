@@ -1,6 +1,6 @@
-import {IJobQueue} from "./jobQueue.interface";
-import {QueueJobRef, QueueName} from "./queue.constants";
-import {JobsOptions, Queue} from "bullmq";
+import {IJobQueue, JobPayloadMap, JobRef, JobsOptions} from "./jobQueue.interface";
+import {QueueName} from "./queue.constants";
+import {Queue} from "bullmq";
 import {inject, injectable} from "tsyringe";
 import {ILogger} from "../logging/logger.interface";
 import {AppConfig} from "../lib/config";
@@ -41,7 +41,7 @@ export class BullMQJobQueue implements IJobQueue {
         return [...this.queues.values()]
     }
 
-    async addJob(jobRef: QueueJobRef, payload: unknown, options?: JobsOptions): Promise<void> {
+    async addJob<K extends keyof JobPayloadMap & string>(jobRef: JobRef<K>, payload: JobPayloadMap[K], options?: JobsOptions): Promise<void> {
         await this.getQueue(jobRef.queue).add(jobRef.name, payload, this.toBullMQOptions(options));
         this.logger.debug(`Job '${jobRef.name}' added to queue ${jobRef.queue}`);
     }

@@ -143,3 +143,7 @@ vite.config.ts.timestamp-*
 .vite/
 .idea/
 *.http
+
+uploads/
+docs/
+swagger.json

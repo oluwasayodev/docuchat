@@ -22,7 +22,7 @@ export class BadRequestException extends HttpError {
 
 export class ConflictException extends HttpError {
     constructor(message = "Already exists") {
-        super(400, message);
+        super(409, message);
     }
 }
 
@@ -46,4 +46,10 @@ export class InternalServerError extends HttpError {
         super(500, message);
     }
 
+}
+
+export class PayloadTooLargeError extends HttpError {
+    constructor(message: string = "Payload too large") {
+        super(413, message);
+    }
 }

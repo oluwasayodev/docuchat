@@ -7,9 +7,9 @@ import {ILogger} from "../logging/logger.interface";
 import {ICacheService} from "../cache/cacheService.interface";
 import {AppConfig} from "../lib/config";
 import jwt from "jsonwebtoken";
-import {BadRequestException, ConflictException, NotFoundError} from "../errors/http.error";
+import {BadRequestException, NotFoundError} from "../errors/http.error";
 import bcrypt from "bcryptjs";
-import {QUEUE_JOBS, QUEUE_NAMES, QUEUES} from "../queues/queue.constants";
+import {QUEUES} from "../queues/queue.constants";
 import {IJobQueue} from "../queues/jobQueue.interface";
 
 

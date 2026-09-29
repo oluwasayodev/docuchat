@@ -6,6 +6,10 @@ import {IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min, MinLength, val
 
 dotenv.config()
 
+export const TOKEN_ENCODINGS = ["cl100k_base" , "o200k_base" , "p50k_base" , "r50k_base"] as const;
+
+export type TokenEncoding = (typeof TOKEN_ENCODINGS)[number];
+
 export enum NodeEnv {
     PRODUCTION = "production",
     DEVELOPMENT = "development",
@@ -207,6 +211,32 @@ export class AppConfig {
     @IsEnum(["in-memory", "redis"])
     @IsOptional()
     readonly cacheDriver: "in-memory" | "redis" = "in-memory";
+
+    @Expose({name: "DOCUMENT_MAX_UPLOAD_SIZE_BYTES"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly documentMaxUploadSizeBytes: number = 10_485_760;
+
+    @Expose({name: "DOCUMENT_CHUNK_SIZE_TOKENS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly documentChunkSizeTokens: number = 512;
+
+    @Expose({name: "DOCUMENT_CHUNK_OVERLAP_TOKENS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(0)
+    @IsOptional()
+    readonly documentChunkOverlapTokens: number = 50;
+
+    @Expose({name: "DOCUMENT_TOKEN_ENCODING"})
+    @IsOptional()
+    readonly documentTokenEncoding: TokenEncoding  = "cl100k_base";
+
 
     get isProduction(): boolean {
         return this.env === NodeEnv.PRODUCTION;

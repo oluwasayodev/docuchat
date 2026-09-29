@@ -4,8 +4,7 @@ import {inject, injectable} from "tsyringe";
 import {ILogger} from "../logging/logger.interface";
 import {AppConfig} from "../lib/config";
 import {IJobQueue} from "../queues/jobQueue.interface";
-import {Record} from "@prisma/client/runtime/client";
-import {QUEUE_JOBS, QUEUE_NAMES, QueueJobRef, QueueName, QUEUES} from "../queues/queue.constants";
+import {QueueJobRef, QueueName, QUEUES} from "../queues/queue.constants";
 
 
 @injectable()
