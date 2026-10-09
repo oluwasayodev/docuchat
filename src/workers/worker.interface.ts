@@ -7,6 +7,8 @@ export interface WorkContext {
     jobName: string;
     payload: unknown;
     attemptsMade: number;
+    updateProgress: (value: number) => Promise<void>;
+    log: (message: string) => Promise<void>;
 }
 
 export interface IWorker {

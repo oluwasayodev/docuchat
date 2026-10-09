@@ -1,4 +1,4 @@
-import {ICacheService} from "./cacheService.interface";
+import {CacheTtl, ICacheService, NO_EXPIRY} from "./cacheService.interface";
 import {singleton} from "tsyringe";
 
 
@@ -6,6 +6,7 @@ import {singleton} from "tsyringe";
 export class InMemoryCacheService implements ICacheService {
 
     private store = new Map<string, {value: string, expiresAt?: number}>();
+    private locks = new Set<string>();
 
 
 
@@ -29,18 +30,29 @@ export class InMemoryCacheService implements ICacheService {
         return JSON.parse(item.value) as T;
     }
 
-    async getOrSet<T>(key: string, factory: () => Promise<T>, ttlSeconds?: number): Promise<T> {
+    async getOrSet<T>(key: string, factory: () => Promise<T>, ttlSeconds: CacheTtl): Promise<T> {
         const cached = await this.get<T>(key);
-        if (cached) return cached;
+        if (cached !== null && cached !== undefined) return cached;
 
-        const fresh = await factory();
-        if (fresh) await this.set(key, fresh, ttlSeconds);
+        const lockKey = `${key}:lock`;
 
-        return fresh;
+        if (!this.locks.has(lockKey)) {
+            this.locks.add(lockKey);
+            try {
+                const fresh = await factory();
+                if (fresh !== null && fresh !== undefined) await this.set(key, fresh, ttlSeconds);
+                return fresh;
+            } finally {
+                this.locks.delete(lockKey);
+            }
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const waited = await this.get<T>(key);
+        return waited !== null && waited !== undefined ? waited : factory();
     }
 
-    async set<T>(key: string, value: any, ttlSeconds: number | undefined): Promise<void> {
-        const expiresAt = ttlSeconds ? Date.now() + ttlSeconds * 1000 : undefined;
+    async set<T>(key: string, value: T, ttlSeconds: CacheTtl): Promise<void> {
+        const expiresAt = ttlSeconds === NO_EXPIRY ? undefined : Date.now() + ttlSeconds * 1000 ;
         this.store.set(key, {value: JSON.stringify(value), expiresAt});
     }
 

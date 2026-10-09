@@ -52,7 +52,7 @@ export class DocumentChunker implements IDocumentChunker {
                     index: chunks.length,
                     content,
                     tokenCount: this.encoder.encode(content).length,
-                    metadata: {pageNumber: page.num},
+                    metadata: {page: page.num},
                 })
             }
         }

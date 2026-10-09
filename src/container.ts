@@ -41,10 +41,28 @@ import {IDocumentService} from "./services/documentService.interface";
 import {DocumentService} from "./services/document.service";
 import {IDocumentProcessingService} from "./services/documentProcessingService.interface";
 import {DocumentProcessingService} from "./services/documentProcessingService";
+import {chunkStoreFactory} from "./stores/chunkStore.factory";
+import {IChunkStore} from "./stores/chunkStore.interface";
+import {OpenAIEmbeddingModel} from "./models/embedding/openaiEmbeddingModel";
+import {EmbeddingModelFactory, IEmbeddingModelFactory} from "./models/embedding/embeddingModel.factory";
+import {PrismaConversationRepository} from "./repositories/prismaConversationRepository";
+import {IConversationRepository} from "./repositories/conversationRepository.interface";
+import {ChatModelRegistry} from "./chat/chatModelRegistry";
+import {CHAT_MODELS} from "./chat/modelCatalog";
+import {IChatModel} from "./chat/chatModel.interface";
+import {OllamaChatModel} from "./chat/ollamaChatModel";
+import {ChatModelFactory, IChatModelFactory} from "./chat/chatModel.factory";
+import {IChatService} from "./services/chatService.interface";
+import {ChatService} from "./services/chat.service";
+import {IConversationService} from "./services/conversationService.interface";
+import {ConversationService} from "./services/conversation.service";
 
 
 container.register("IAuthProvider", {useClass: GoogleAuthProvider})
 container.register("IAuthProvider", {useClass: CognitoAuthProvider})
+
+container.register<IChatService>("IChatService", {useClass: ChatService});
+container.register<IConversationService>("IConversationService", {useClass: ConversationService});
 
 
 container.registerInstance(PrismaClient, prisma)
@@ -63,6 +81,10 @@ container.register<IStorageService>("IStorageService", {
     useFactory: storageFactory
 })
 
+container.register<IChunkStore>("IChunkStore", {
+    useFactory: chunkStoreFactory
+})
+
 container.registerSingleton("IDocumentParser", TextDocumentParser);
 container.registerSingleton("IDocumentParser", PdfDocumentParser);
 container.registerSingleton("IDocumentParser", DocxDocumentParser);
@@ -77,5 +99,16 @@ container.register<IJobQueue>("IJobQueue", {useClass: BullMQJobQueue})
 container.register<IWorker>("IWorker", {useFactory: workerFactory});
 container.register<IDocumentService>("IDocumentService", {useClass: DocumentService});
 container.register<IDocumentProcessingService>("IDocumentProcessingService", {useClass: DocumentProcessingService});
+
+
+container.registerSingleton("IEmbeddingModel", OpenAIEmbeddingModel);
+container.register<IEmbeddingModelFactory>("IEmbeddingModelFactory", {useClass: EmbeddingModelFactory})
+container.registerSingleton<IConversationRepository>("IConversationRepository", PrismaConversationRepository);
+
+container.register("ChatModelRegistry", {
+    useValue: new ChatModelRegistry(config, CHAT_MODELS)
+})
+container.registerSingleton<IChatModel>("IChatModel", OllamaChatModel);
+container.register<IChatModelFactory>("IChatModelFactory", {useClass: ChatModelFactory});
 
 export {container};

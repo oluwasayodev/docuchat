@@ -1,4 +1,9 @@
 
+
+export type ProgressCallback = (progress: number) => Promise<void> | void;
+export type LogCallback = (message: string) => Promise<void> | void;
+
+
 export interface DocumentProcessingResult {
 
     documentId: string;
@@ -10,6 +15,11 @@ export interface DocumentProcessingResult {
 
 export interface IDocumentProcessingService {
 
-    process(documentId: string): Promise<DocumentProcessingResult>;
+    process(
+        documentId: string,
+        onProgress?: ProgressCallback,
+        onLog?: LogCallback
+    ): Promise<DocumentProcessingResult>;
+
 }
 

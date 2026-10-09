@@ -45,7 +45,7 @@ export class AuthService implements IAuthService {
         }
         this.logger.info("User logged in successfully: ", {userId: user.id});
 
-        await this.cache.set(`user:session:${user.id}`, JSON.stringify({roles: user.roles}), 3600);
+        await this.cache.set(`user:session:${user.id}`, {roles: user.roles.map(r => r.role.name)}, 3600);
         await this.eventBus.publish("auth:user-login", {userId: user.id });
         return this.generateTokenPair(user);
     }

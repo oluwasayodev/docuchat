@@ -1,7 +1,10 @@
 export const USAGE_ACTIONS = [
     "DOCUMENT_UPLOADED",
     "DOCUMENT_PROCESSED",
-    "DOCUMENT_DELETED"
+    "DOCUMENT_DELETED",
+    "EMBEDDING",
+    "DOCUMENT_SEARCH",
+    "CHAT_COMPLETION"
 ] as const;
 
 export type UsageAction = (typeof USAGE_ACTIONS)[number];

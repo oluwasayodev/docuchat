@@ -1,6 +1,7 @@
 import {Document, DocumentChunk} from "../types/document.types";
 import {ListDocumentQuery} from "../repositories/documentRepository.interface";
 import {Page} from "../types/pagination.type";
+import {SearchChunkResult} from "../stores/chunkStore.interface";
 
 export interface UploadedFile {
     originalName: string;
@@ -22,6 +23,12 @@ export interface DocumentDownload {
     mimeType: string;
 }
 
+export interface DocumentSearchResult {
+    documentId: string;
+    query: string;
+    chunks: SearchChunkResult[];
+}
+
 
 export interface IDocumentService {
     upload(userId: string, file: UploadedFile, data?: UploadDocumentData): Promise<Document>;
@@ -32,4 +39,5 @@ export interface IDocumentService {
     listChunks(userId: string, id:string): Promise<DocumentChunk[]>;
     remove(userId: string, id: string): Promise<Document>;
     reprocess(userId: string, id: string): Promise<Document>;
+    search(userId: string, id: string, query: string, limit?: number): Promise<DocumentSearchResult>;
 }

@@ -1,12 +1,13 @@
 import {NextFunction, RequestHandler, Request, Response} from "express";
 import {plainToInstance} from "class-transformer";
 import {validate, ValidationError} from "class-validator";
+import {ValidateError} from '@tsoa/runtime'
 
 
 export function validateDtoMiddleware(dtoClass: any): RequestHandler {
 
     return async (req, res, next): Promise<void> => {
-        const dtoInstance = plainToInstance(dtoClass, req.body);
+        const dtoInstance = plainToInstance(dtoClass, req.body ?? {});
         const errors: ValidationError[] = await validate(dtoInstance, {
             whitelist: true,
             forbidNonWhitelisted: true,

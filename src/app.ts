@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import express, {Router} from 'express';
-import cors from 'cors';
 import helmet from 'helmet';
 import {config} from "./lib/config";
 import {logger} from "./lib/logger";
@@ -11,12 +10,13 @@ import {basicAuthMiddleware} from "./middleware/basicAuth.middleware";
 import {getBullBoardRouter} from "./queues/bullBoard.setup";
 import swaggerUi from "swagger-ui-express";
 import swaggerDoc from './generated/swagger.json';
+import {corsMiddleware} from "./middleware/corsMiddleware";
 
 
 export const app = express();
 
 
-app.use(cors())
+app.use(corsMiddleware)
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

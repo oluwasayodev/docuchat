@@ -58,7 +58,13 @@ export class BullMQWorker implements IWorker {
             queueName: job.queueName,
             jobName: job.name,
             payload: job.data,
-            attemptsMade: job.attemptsMade
+            attemptsMade: job.attemptsMade,
+            updateProgress: async (value: number) => {
+                await job.updateProgress(value).catch(() => undefined);
+            },
+            log: async (message: string) => {
+                await job.log(message).catch(() => undefined);
+            }
         }
 
         this.logger.info(`Processing '${ctx.queueName}:${ctx.jobName}' (id: ${ctx.jobId})`);

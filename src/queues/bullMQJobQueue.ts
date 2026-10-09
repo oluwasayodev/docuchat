@@ -47,12 +47,12 @@ export class BullMQJobQueue implements IJobQueue {
     }
 
     private toBullMQOptions(options?: JobsOptions): JobsOptions {
-        return {
-            jobId: options?.jobId,
-            delay: options?.delay,
-            priority: options?.priority,
-            attempts: options?.attempts,
-        }
+        const opts: JobsOptions = {};
+        if (options?.jobId !== undefined) opts.jobId = options.jobId;
+        if (options?.delay !== undefined) opts.delay = options.delay;
+        if (options?.priority !== undefined) opts.priority = options.priority;
+        if (options?.attempts !== undefined) opts.attempts = options.attempts
+        return opts;
     }
 
 

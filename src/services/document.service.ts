@@ -1,6 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {
-    DocumentDownload,
+    DocumentDownload, DocumentSearchResult,
     DocumentWithUrl,
     IDocumentService,
     UploadDocumentData,
@@ -18,7 +18,11 @@ import {randomUUID} from "node:crypto";
 import {QUEUES} from "../queues/queue.constants";
 import {Document, DocumentChunk} from "../types/document.types";
 import {DOCUMENT_EVENTS} from "../events/types/document.events";
+import {IChunkStore, SearchChunkResult} from "../stores/chunkStore.interface";
 import {error, query} from "winston";
+import {AppConfig} from "../lib/config";
+import {IEmbeddingModelFactory} from "../models/embedding/embeddingModel.factory";
+import {IUsageLogRepository} from "../repositories/usageLogRepository.interface";
 
 
 @injectable()
@@ -30,6 +34,10 @@ export class DocumentService implements IDocumentService {
         @inject("IJobQueue") private readonly jobQueue: IJobQueue,
         @inject("IEventBus") private readonly eventBus: IEventBus,
         @inject("ILogger") private readonly logger: ILogger,
+        @inject("IChunkStore") private readonly chunkStore: IChunkStore,
+        @inject("IEmbeddingModelFactory") private readonly embeddingModelFactory: IEmbeddingModelFactory,
+        @inject("IUsageLogRepository") private readonly usageLogRepository: IUsageLogRepository,
+        @inject(AppConfig) private readonly config: AppConfig,
     ) {}
 
 
@@ -57,13 +65,18 @@ export class DocumentService implements IDocumentService {
     }
 
     async listChunks(userId: string, id: string): Promise<DocumentChunk[]> {
-        await this.findOwnById(userId, id);
-        return this.documentRepository.listDocumentChunks(id);
+        const document = await this.findOwnById(userId, id);
+        const chunks = await this.chunkStore.listChunks(document.id, 1000);
+        return chunks as unknown as DocumentChunk[];
     }
 
     async remove(userId: string, id: string): Promise<Document> {
         const existing = await this.findOwnById(userId, id);
-        const document = this.documentRepository.softDelete(existing.id, userId);
+        const document = await this.documentRepository.softDelete(existing.id, userId);
+        await this.chunkStore.deleteForDocument(existing.id)
+            .catch(error => {
+                this.logger.warn("Failed to clear chunks on delete", {documentId: existing.id, error});
+            })
         await this.publishSafely(DOCUMENT_EVENTS.DOCUMENT_DELETED, {documentId: existing.id, userId});
         return document;
     }
@@ -115,6 +128,34 @@ export class DocumentService implements IDocumentService {
         return document;
     }
 
+    async search(userId: string, id: string, query: string, limit?: number): Promise<DocumentSearchResult> {
+        const document = await this.findOwnById(userId, id);
+        if(document.status != "READY") {
+            throw new ConflictException("Document is not ready for search");
+        }
+
+        const trimmed = query.trim();
+        if (trimmed.length === 0) {
+            throw new BadRequestException("Query is required");
+        }
+
+        const maxChunks = Math.min(Math.max(limit ?? this.config.maxRetrievalChunks, 1), 20);
+
+        if (this.config.embeddingDriver == "none") {
+            return {documentId: document.id, query: trimmed, chunks: []}
+        }
+
+        const model = this.embeddingModelFactory.resolve();
+        const [queryEmbedding] = await model.embed([trimmed]);
+        const chunks = await this.chunkStore.searchChunks(document.id, queryEmbedding, maxChunks, this.config.minScore);
+
+        await this.logSearchUsage(userId, document.id, trimmed, chunks, model.modelId);
+
+        return {documentId: document.id, query: trimmed, chunks};
+    }
+
+
+
 
     private async publishSafely<K extends "documents:uploaded" | "documents:deleted">(
         event: K,
@@ -155,7 +196,26 @@ export class DocumentService implements IDocumentService {
     }
 
 
+    private async logSearchUsage(
+        userId: string,
+        documentId: string,
+        query: string,
+        chunks: SearchChunkResult[],
+        embeddingModel: string): Promise<void> {
 
-
-
+        try {
+            await this.usageLogRepository.createUsageLog({
+                userId,
+                action: "DOCUMENT_SEARCH",
+                metadata: {
+                    documentId,
+                    embeddingModel,
+                    query: query.slice(0, 200),
+                    chunksUsed: chunks.length,
+                }
+            })
+        } catch (error) {
+            this.logger.warn("Failed to log DOCUMENT_SEARCH usage", {documentId, error});
+        }
+    }
 }

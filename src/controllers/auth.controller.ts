@@ -1,6 +1,5 @@
 import {inject, injectable} from "tsyringe";
 import {IAuthService} from "../services/authService.interface";
-import {Request, Response} from "express";
 import {AuthResponse, LoginRequest, RefreshTokenRequest, RegisterRequest} from "../dtos/auth.dto";
 import {Body, Controller, Middlewares, Post, Route, Security, SuccessResponse, Tags} from "tsoa";
 import {Serialize} from "../middleware/serialize.middleware";

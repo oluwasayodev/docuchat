@@ -1,7 +1,18 @@
 import "reflect-metadata";
 import dotenv from "dotenv";
 import {Expose, plainToInstance, Type} from "class-transformer";
-import {IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min, MinLength, validateSync} from "class-validator";
+import {
+    IsBoolean,
+    IsEnum,
+    IsInt,
+    IsNumber,
+    IsOptional,
+    IsString,
+    Max,
+    Min,
+    MinLength,
+    validateSync
+} from "class-validator";
 
 
 dotenv.config()
@@ -23,6 +34,11 @@ export class AppConfig {
     @IsEnum(NodeEnv)
     @IsOptional()
     readonly env: NodeEnv = NodeEnv.DEVELOPMENT;
+
+    @Expose({name: "FRONTEND_URL"})
+    @IsString()
+    @IsOptional()
+    readonly frontendUrl: string = "http://localhost:3000";
 
     @Expose({name: "PORT"})
     @Type(() => Number)
@@ -135,6 +151,79 @@ export class AppConfig {
     @IsEnum(["local", "s3", "minio"])
     @IsOptional()
     readonly storageDriver: "local" | "s3" | "minio" = "local";
+
+    @Expose({name: "CHUNK_STORE"})
+    @IsEnum(["postgres", "elasticsearch"])
+    @IsOptional()
+    readonly chunkStore: "postgres" | "elasticsearch" = "postgres";
+
+    @Expose({name: "ES_NODE"})
+    @IsString()
+    @IsOptional()
+    readonly esNode: string = "http://localhost:9200"
+
+    @Expose({name: "ES_INDEX_PREFIX"})
+    @IsString()
+    @IsOptional()
+    readonly esIndexPrefix: string = "docuchat"
+
+    @Expose({name: "EMBEDDING_DRIVER"})
+    @IsEnum(["openai", "none"])
+    @IsOptional()
+    readonly embeddingDriver: "openai" | "none" = "openai";
+
+    @Expose({name: "EMBEDDING_MODEL"})
+    @IsString()
+    @IsOptional()
+    readonly embeddingModel: string = "text-embedding-3-small";
+
+    @Expose({name: "EMBEDDING_MODEL"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(128)
+    @Max(3072)
+    @IsOptional()
+    readonly embeddingDimensions: number = 1536;
+
+    @Expose({name: "CHAT_MODEL"})
+    @IsString()
+    @IsOptional()
+    readonly chatModel: string = "gpt-4o-mini"
+
+    @Expose({name: "MAX_RETRIEVAL_CHUNKS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly maxRetrievalChunks: number = 6;
+
+    @Expose({name: "CHAT_MAX_TOKENS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly chatMaxTokens: number = 1024;
+
+    @Expose({name: "CHAT_TEMPERATURE"})
+    @Type(() => Number)
+    @IsNumber()
+    @Min(0)
+    @Max(2)
+    @IsOptional()
+    readonly chatTemperature: number = 0.1;
+
+    @Expose({name: "MIN_SCORE"})
+    @Type(() => Number)
+    @IsNumber()
+    @Min(0)
+    @Max(1)
+    @IsOptional()
+    readonly minScore: number = 0.3;
+
+    @Expose({name: "OPENAI_BASE_URL"})
+    @IsString()
+    @IsOptional()
+    readonly openaiBaseUrl?: string
 
     @Expose({name: "CLIENT_URL"})
     @IsString()
@@ -257,6 +346,12 @@ export class AppConfig {
             }
             process.exit(1);
         }
+
+        if (config.embeddingDriver === "openai" && !config.openaiApiKey) {
+            console.error("Invalid environment variables \n - OPENAI_API_KEY is required when EMBEDDING_DRIVER=openai");
+            process.exit(1);
+        }
+
         return config;
     }
 }

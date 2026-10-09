@@ -19,6 +19,12 @@ enum DocumentStatus {
   FAILED
 }
 
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
 model User {
   id            String         @id @default(uuid())
   name          String
@@ -28,6 +34,7 @@ model User {
   identities    UserIdentity[]
   refreshTokens RefreshToken[]
   documents     ChatDocument[]
+  conversations Conversation[]
   usageLogs     UsageLog[]
   tier          String         @default("free")
   isActive      Boolean        @default(true)
@@ -40,24 +47,25 @@ model User {
 }
 
 model ChatDocument {
-  id              String          @id @default(uuid())
+  id              String                 @id @default(uuid())
   userId          String
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   name            String
   description     String?
   storageKey      String
   mimeType        String
   sizeBytes       Int
-  status          DocumentStatus  @default(UPLOADED)
+  status          DocumentStatus         @default(UPLOADED)
   processingError String?
   pageCount       Int?
-  chunkCount      Int             @default(0)
+  chunkCount      Int                    @default(0)
   processedAt     DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
   deletedAt       DateTime?
   deletedBy       String?
   documentChunks  DocumentChunk[]
+  conversations   ConversationDocument[]
 
   @@index([userId, deletedAt, createdAt])
   @@index([userId, status])
@@ -65,17 +73,19 @@ model ChatDocument {
 }
 
 model DocumentChunk {
-  id         String       @id @default(uuid())
+  id         String                       @id @default(uuid())
   documentId String
-  document   ChatDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  document   ChatDocument                 @relation(fields: [documentId], references: [id], onDelete: Cascade)
   index      Int
   content    String
-  tokenCount Int          @default(0)
+  tokenCount Int                          @default(0)
   metadata   Json?
-  createdAt  DateTime     @default(now())
+  embedding  Unsupported("vector(1536)")?
+  createdAt  DateTime                     @default(now())
 
   @@unique([documentId, index])
   @@index([documentId])
+  @@index([embedding], name: "embedding_hnsw_idx")
   @@map("document_chunks")
 }
 
@@ -169,4 +179,47 @@ model RolePermission {
 
   @@id([roleId, permissionId])
   @@map("role_permissions")
+}
+
+model Conversation {
+  id        String                 @id @default(uuid())
+  userId    String
+  user      User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  messages  Message[]
+  documents ConversationDocument[]
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+  deletedAt DateTime?
+  deletedBy String?
+
+  @@index([userId, deletedAt, createdAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  content        String
+  modelId        String?
+  tokenCount     Int          @default(0)
+  costUsd        Decimal?     @db.Decimal(10, 6)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+model ConversationDocument {
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  documentId     String
+  document       ChatDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@id([conversationId, documentId])
+  @@index([documentId])
+  @@map("conversation_documents")
 }

@@ -10,13 +10,19 @@ import {
     Path,
     Delete,
     Route,
-    Tags
+    Tags, Body
 } from "tsoa";
 import {inject, injectable} from "tsyringe";
 import {DocumentService} from "../services/document.service";
 import {Serialize} from "../middleware/serialize.middleware";
 import {AppConfig} from "../lib/config";
-import {ChunkResponse, DocumentListResponse, DocumentResponse} from "../dtos/document.dto";
+import {
+    ChunkResponse,
+    DocumentListResponse,
+    DocumentResponse,
+    DocumentSearchResponse,
+    SearchRequest
+} from "../dtos/document.dto";
 import {Request as ExpressRequest} from "express";
 import {documentUpload} from "../middleware/upload.middleware";
 import {container} from "../container";
@@ -133,6 +139,20 @@ export class DocumentController extends Controller{
 
         const document = await this.documentService.reprocess(req.user!.id, id);
         return document as DocumentResponse;
+    }
+
+    @Post("{id}/search")
+    @SuccessResponse("200", "OK")
+    @Security("jwt")
+    @Middlewares(Serialize(DocumentSearchResponse))
+    async search(
+        @Request() req: ExpressRequest,
+        @Path() id: string,
+        @Body() dto: SearchRequest
+    ): Promise<DocumentSearchResponse> {
+
+        const result = await this.documentService.search(req.user!.id, id, dto.query, dto.limit);
+        return result as DocumentSearchResponse;
     }
 }
 

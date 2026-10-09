@@ -19,7 +19,7 @@ export function registerJobHandlers(worker: IWorker): IWorker {
         .register(QUEUES.DOCUMENTS.jobs.PROCESS_DOCUMENT, async (ctx) => {
             const processing = container.resolve("IDocumentProcessingService") as IDocumentProcessingService;
             const { documentId } = ctx.payload as {documentId: string};
-            await processing.process(documentId);
+            await processing.process(documentId, ctx.updateProgress, ctx.log);
         })
 
     return worker;
