@@ -2,6 +2,8 @@ import {ILogger} from "./logger.interface";
 import pino, {Logger as PinoNative } from "pino";
 import {inject, injectable, singleton} from "tsyringe";
 import {AppConfig} from "../lib/config";
+import {Writable} from "node:stream";
+import {formatConsoleLine} from "./consoleFormat";
 
 
 @injectable()
@@ -12,10 +14,7 @@ export class PinoLogger implements ILogger {
 
     constructor(@inject(AppConfig) appConfig: AppConfig, pinoInstance?: PinoNative) {
         this.appConfig = appConfig;
-        this.pino = pinoInstance || pino({
-            level: this.appConfig.logLevel,
-            transport: this.appConfig.env !== 'production' ? {target: 'pino-pretty'} : undefined,
-        })
+        this.pino = pinoInstance || this.createLogger();
     }
 
     child(bindings: Record<string, any>): ILogger {
@@ -40,4 +39,24 @@ export class PinoLogger implements ILogger {
     }
 
 
+    private createLogger(): PinoNative {
+        const options = {level: this.appConfig.logLevel}
+        if (this.appConfig.env === "production") {
+            return pino(options);
+        }
+
+        return pino(options, new Writable({
+            write: (chunk, _encoding, callback) => {
+                for (const line of chunk.toString().split("\n")) {
+                    if (!line) continue;
+                    try {
+                        process.stdout.write(formatConsoleLine(JSON.parse(line)) + "\n");
+                    } catch {
+                        process.stdout.write(line + "\n");
+                    }
+                }
+                callback();
+            }
+        }));
+    }
 }

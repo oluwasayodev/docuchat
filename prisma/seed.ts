@@ -1,7 +1,8 @@
 import {PERMISSIONS} from "../src/constants/permissions";
-import {logger} from "../src/lib/logger";
 import {prisma} from "../src/lib/prisma";
 import {RoleName, ROLES} from "../src/constants/roles";
+import {ILogger} from "../src/logging/logger.interface";
+import {container} from "../src/container";
 
 
 
@@ -45,6 +46,7 @@ function parsePermission(permission: string): PermissionKey {
 
 
 async function main() {
+    const logger = container.resolve<ILogger>("ILogger");
     logger.info("Seeding database...");
 
     for(const permission of Object.values(PERMISSIONS)) {
@@ -87,7 +89,8 @@ async function main() {
 
 main()
     .catch((err: Error) => {
-        logger.error(err);
+        const logger = container.resolve<ILogger>("ILogger");
+        logger.error("Seed error...", err);
         process.exit(1);
     })
     .finally(async () => {

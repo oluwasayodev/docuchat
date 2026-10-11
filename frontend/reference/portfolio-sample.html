@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Dorothy James | AI Engineer</title>
+    <meta name="description" content="Portfolio of Dorothy James, an emerging AI Engineer building backend systems and AI-powered applications.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --s1:8px;--s2:16px;--s3:24px;--s4:32px;--s5:40px;--s6:48px;--s8:64px;--s12:96px;
+            --ink:#171717;--muted:#525252;--line:#e5e5e5;--bg:#fff;--tint:#fafafa;
+            --green:#0F5132;--green-dark:#0a3a24;
+            --r:6px;--max:1200px;--t:180ms;
+        }
+        *,*::before,*::after{box-sizing:border-box}
+        html{scroll-behavior:smooth;scroll-padding-top:80px}
+        body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:clamp(1rem,.96rem + .2vw,1.125rem);line-height:1.6;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+        h1,h2,h3,p,ul,ol,dl,dd,figure{margin:0}
+        ul,ol{padding:0;list-style:none}
+        a{color:var(--green);text-underline-offset:3px;transition:color var(--t)}
+        a:hover{color:var(--green-dark)}
+        :focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:var(--r)}
+        .skip{position:absolute;left:var(--s2);top:-100px;background:var(--ink);color:#fff;padding:var(--s1) var(--s2);border-radius:var(--r);z-index:30}
+        .skip:focus{top:var(--s2)}
+        .container{width:100%;max-width:var(--max);margin:0 auto;padding:0 var(--s3)}
+
+        /* Buttons */
+        .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 var(--s3);font:600 1rem/1 Inter,system-ui,sans-serif;border-radius:var(--r);border:1px solid var(--line);text-decoration:none;transition:background-color var(--t),border-color var(--t),color var(--t);cursor:pointer}
+        .btn--primary{background:var(--green);border-color:var(--green);color:#fff}
+        .btn--primary:hover{background:var(--green-dark);border-color:var(--green-dark);color:#fff}
+        .btn--secondary{background:#fff;color:var(--ink);border-color:#d4d4d4}
+        .btn--secondary:hover{border-color:var(--ink);color:var(--ink)}
+
+        /* Nav */
+        .nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+        .nav__in{display:flex;align-items:center;justify-content:space-between;min-height:72px}
+        .nav__brand{font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+        .nav__brand:hover{color:var(--ink)}
+        .nav__links{display:flex;align-items:center;gap:var(--s4)}
+        .nav__links a:not(.btn){color:var(--ink);text-decoration:none;font-weight:500;font-size:.95rem}
+        .nav__links a:not(.btn):hover{color:var(--green)}
+        .nav__links .btn{min-height:40px;font-size:.95rem}
+        .nav__toggle{display:none;min-height:44px;padding:0 var(--s2);background:#fff;border:1px solid #d4d4d4;border-radius:var(--r);font:500 .95rem Inter,system-ui,sans-serif;color:var(--ink);cursor:pointer}
+
+        /* Hero */
+        .hero{position:relative;border-bottom:1px solid var(--line);overflow:hidden}
+        .hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+        .hero__in{position:relative;padding-top:var(--s12);padding-bottom:var(--s12);pointer-events:none}
+        .hero__copy{max-width:760px;pointer-events:auto}
+        .hero__name{font-weight:700;letter-spacing:.04em;font-size:.95rem}
+        .hero__role{font-weight:600;letter-spacing:.04em;font-size:.95rem;color:var(--green)}
+        .hero__tags{font-weight:500;letter-spacing:.04em;font-size:.95rem;color:var(--muted);margin-bottom:var(--s4)}
+        h1{font-size:clamp(2.25rem,1.4rem + 3.6vw,4rem);line-height:1.08;letter-spacing:-.035em;font-weight:700;max-width:14em}
+        .lead{max-width:34em;margin-top:var(--s3);color:var(--muted)}
+        .actions{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s4)}
+
+        /* Sections */
+        .section{padding:var(--s12) 0 0;border-bottom:1px solid var(--line)}
+        .section--tint{background:var(--tint)}
+        .head{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--s3);margin-bottom:var(--s6);align-items:start}
+        .head h2{grid-column:span 5}
+        .head>p,.head>div{grid-column:7 / span 6;max-width:36em}
+        .head>p:only-child{grid-column:7 / span 6}
+        h2{font-size:clamp(1.625rem,1.2rem + 1.6vw,2.5rem);line-height:1.15;letter-spacing:-.03em;font-weight:700}
+        h3{font-size:1.125rem;line-height:1.3;letter-spacing:-.01em;font-weight:600;margin-bottom:var(--s2)}
+        .note{margin-top:var(--s1);font-size:.9rem;color:var(--muted)}
+        .head .actions{margin-top:var(--s3)}
+
+        /* Cards */
+        .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3)}
+        .cards--4{grid-template-columns:repeat(4,1fr)}
+        .card{display:block;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);color:var(--ink);text-decoration:none;transition:border-color var(--t)}
+        .card p+p{margin-top:var(--s1)}
+        .card p{font-size:.95rem}
+        .card strong{font-weight:600}
+        .card:hover{border-color:#a3a3a3}
+        .card--link:hover h3{color:var(--green)}
+        .card li{padding:var(--s1) 0;border-top:1px solid var(--line);font-size:.95rem}
+        .card li:first-child{border-top:0;padding-top:0}
+        .meta{color:var(--muted)}
+        .links{display:flex;flex-direction:column;gap:4px;margin-top:var(--s2);font-size:.95rem;font-weight:500}
+        .links--row{flex-direction:row;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s5)}
+
+        /* Steps */
+        .steps{display:grid;gap:0;counter-reset:s;border:1px solid var(--line);border-radius:var(--r);background:#fff;overflow:hidden}
+        .steps--6{grid-template-columns:repeat(6,1fr)}
+        .steps--4{grid-template-columns:repeat(4,1fr)}
+        .steps li{padding:var(--s3);border-left:1px solid var(--line);font-weight:600;counter-increment:s}
+        .steps li:first-child{border-left:0}
+        .steps li::before{content:counter(s);display:block;color:var(--green);font-weight:600;font-size:.9rem;margin-bottom:var(--s1)}
+        .steps li p{font-weight:400;color:var(--muted);font-size:.95rem}
+
+        /* Bootcamp */
+        .bootcamp{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s6);align-items:baseline;justify-content:space-between}
+        .bootcamp h2{font-size:1rem;letter-spacing:.02em;font-weight:600;color:var(--muted)}
+        .inline{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s4);font-weight:500}
+
+        /* Footer */
+        .footer__links{display:flex;gap:var(--s3)}
+        .footer strong{color:var(--ink)}
+
+        /* Reveal */
+        .reveal{opacity:0;transform:translateY(12px);transition:opacity 500ms ease,transform 500ms ease}
+        .reveal.in{opacity:1;transform:none}
+
+        @media (max-width:1024px){
+            .cards,.cards--4{grid-template-columns:repeat(2,1fr)}
+            .steps--6{grid-template-columns:repeat(3,1fr)}
+            .steps--6 li:nth-child(4){border-left:0}
+            .steps--6 li:nth-child(n+4){border-top:1px solid var(--line)}
+            .steps--4{grid-template-columns:repeat(2,1fr)}
+            .steps--4 li:nth-child(3){border-left:0}
+            .steps--4 li:nth-child(n+3){border-top:1px solid var(--line)}
+            .head h2{grid-column:1 / -1}
+            .head>p,.head>div,.head>p:only-child{grid-column:1 / -1}
+        }
+        @media (max-width:720px){
+            .section{padding:var(--s8) 0 0}
+            .hero__in{padding-top:var(--s8);padding-bottom:var(--s8)}
+            .nav__toggle{display:inline-flex;align-items:center}
+            .nav__links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;background:#fff;border-bottom:1px solid var(--line);padding:var(--s1) var(--s3) var(--s3)}
+            .nav__links.open{display:flex}
+            .nav__links a:not(.btn){padding:var(--s2) 0;border-bottom:1px solid var(--line)}
+            .nav__links .btn{margin-top:var(--s2);min-height:48px}
+            .cards,.cards--4,.steps--4{grid-template-columns:1fr}
+            .steps--4 li{border-left:0;border-top:1px solid var(--line)}
+            .steps--4 li:first-child{border-top:0}
+            .steps--6{grid-template-columns:repeat(2,1fr)}
+            .steps--6 li{border-left:1px solid var(--line);border-top:1px solid var(--line)}
+            .steps--6 li:nth-child(odd){border-left:0}
+            .steps--6 li:nth-child(-n+2){border-top:0}
+            .actions .btn{flex:1 1 auto}
+        }
+        @media (prefers-reduced-motion:reduce){
+            html{scroll-behavior:auto}
+            .reveal{opacity:1;transform:none;transition:none}
+            *{transition-duration:0s!important}
+        }
+
+        /* Status pill */
+        .status{display:inline-flex;align-items:center;gap:var(--s1);font-size:.9rem;font-weight:500;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:var(--r);padding:4px var(--s2);margin-bottom:var(--s4);text-decoration:none;transition:border-color var(--t),color var(--t)}
+        .status__dot{position:relative;width:8px;height:8px;border-radius:50%;background:var(--green)}
+        .status__dot::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid var(--green);animation:ping 2.6s ease-out infinite}
+        .status__go{max-width:0;margin-left:-8px;opacity:0;overflow:hidden;white-space:nowrap;color:var(--green);font-weight:600;transition:max-width 220ms,margin 220ms,opacity 220ms}
+        .status:hover,.status:focus-visible{border-color:var(--green);color:var(--ink)}
+        .status:hover .status__go,.status:focus-visible .status__go{max-width:96px;margin-left:0;opacity:1}
+        @keyframes ping{0%{transform:scale(1);opacity:.9}70%,100%{transform:scale(3.4);opacity:0}}
+
+        /* Progress, bridges */
+        .progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:40}
+        .progress span{display:block;height:100%;background:var(--green);transform:scaleX(0);transform-origin:left}
+        .bridge{position:relative;height:56px;margin-top:var(--s8)}
+        .bridge canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+        #contact{padding-bottom:var(--s12)}
+
+        /* Roles marquee */
+        .roles{padding:var(--s4) 0;border-bottom:1px solid var(--line);overflow:hidden}
+        .roles__label{font-size:.9rem;font-weight:500;letter-spacing:0;color:var(--muted);margin-bottom:var(--s2)}
+        .marquee{overflow:hidden}
+        .marquee__track{display:flex;width:max-content;animation:slide 60s linear infinite}
+        .marquee:hover .marquee__track{animation-play-state:paused}
+        .marquee ul{display:flex;gap:var(--s2);padding-right:var(--s2)}
+        .marquee li{white-space:nowrap;border:1px solid var(--line);border-radius:var(--r);padding:var(--s1) var(--s3);font-weight:500;background:#fff}
+        .marquee li:nth-child(even){background:var(--tint)}
+        @keyframes slide{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+        /* Carousel */
+        .carousel__track{display:flex;gap:var(--s3);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+        .carousel__track::-webkit-scrollbar{display:none}
+        .slide{flex:0 0 calc((100% - 48px) / 3);scroll-snap-align:start;display:flex;flex-direction:column}
+        .slide .links{margin-top:auto;padding-top:var(--s2)}
+        .carousel__bar{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s4)}
+        .carousel__count{min-width:8em;font-size:.95rem;font-weight:500;font-variant-numeric:tabular-nums}
+        .carousel__progress{flex:1;height:2px;background:var(--line);overflow:hidden}
+        .carousel__progress span{display:block;height:100%;background:var(--green);transform:scaleX(.5);transform-origin:left;transition:transform 300ms ease}
+        .carousel__btns{display:flex;gap:var(--s1)}
+        .carousel__btns .btn{min-width:48px;padding:0 var(--s2)}
+        .btn:disabled{opacity:.4;cursor:default}
+
+        /* Case study bento */
+        .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--s3)}
+        .b{grid-column:span 4;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);transition:border-color var(--t)}
+        .b:hover{border-color:#a3a3a3}
+        .b--12{grid-column:1 / -1}.b--6{grid-column:span 6}.b--8{grid-column:span 8}
+        .b h3{font-size:.95rem;font-weight:500;color:var(--muted)}
+        .b p{font-size:.95rem}
+        .b--lead p{font-size:clamp(1.25rem,1rem + 1vw,1.75rem);line-height:1.3;letter-spacing:-.02em;font-weight:600}
+        .b--dark{background:var(--ink);border-color:var(--ink);color:#fff}
+        .b--dark:hover{border-color:var(--ink)}
+        .b--dark h3{color:#a3a3a3}
+        .b--dark a{color:#fff}
+        .b--dark .links--row{margin-top:var(--s3)}
+        .chips{display:flex;flex-wrap:wrap;gap:var(--s1)}
+        .chips li{border:1px solid var(--line);border-radius:var(--r);padding:4px 12px;font-size:.9rem;font-weight:500}
+        .flow{--gap:40px;display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap);margin:var(--s4) 0 var(--s3)}
+        .flow li{position:relative;border:1px solid var(--line);border-radius:var(--r);padding:var(--s2);text-align:center;font-weight:600;background:#fff;animation:lit 7.5s linear infinite;animation-delay:calc(var(--i) * 1.5s)}
+        .flow li:not(:last-child)::after{content:"";position:absolute;left:100%;top:50%;width:var(--gap);height:1px;background:var(--line)}
+        .flow li:not(:last-child)::before{content:"";position:absolute;left:100%;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--green);z-index:1;opacity:0;animation:travel 7.5s linear infinite;animation-delay:calc(var(--i) * 1.5s)}
+        @keyframes lit{0%,16%{border-color:var(--green);color:var(--green)}20%,100%{border-color:var(--line);color:var(--ink)}}
+        @keyframes travel{0%,8%{opacity:0;transform:translateX(0)}9%{opacity:1}18%{opacity:1;transform:translateX(calc(var(--gap) - 6px))}19%,100%{opacity:0}}
+        @keyframes travely{0%,8%{opacity:0;transform:translateY(0)}9%{opacity:1}18%{opacity:1;transform:translateY(calc(var(--gap) - 6px))}19%,100%{opacity:0}}
+
+        /* Footer */
+        .footer{position:relative;overflow:hidden;min-height:280px;display:flex;align-items:flex-end;padding:var(--s4) 0;font-size:.95rem;color:var(--muted)}
+        .footer canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+        .footer__in{position:relative;display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:space-between}
+
+        @media (max-width:1024px){
+            .slide{flex-basis:calc((100% - 24px) / 2)}
+            .b,.b--8{grid-column:span 6}.b--12{grid-column:1 / -1}.b--8{grid-column:1 / -1}
+        }
+        @media (max-width:720px){
+            .slide{flex-basis:88%}
+            .carousel__count{min-width:6.5em}
+            .b,.b--6,.b--8{grid-column:1 / -1}
+            .bridge{margin-top:var(--s6)}
+            #contact{padding-bottom:var(--s8)}
+            .flow{grid-template-columns:1fr;--gap:32px}
+            .flow li:not(:last-child)::after{left:50%;top:100%;width:1px;height:var(--gap)}
+            .flow li:not(:last-child)::before{left:50%;top:100%;margin:0 0 0 -3px;animation-name:travely}
+            .footer{min-height:240px}
+        }
+        @media (prefers-reduced-motion:reduce){
+            .marquee__track{animation:none;width:auto;flex-wrap:wrap}
+            .marquee ul[aria-hidden]{display:none}
+            .marquee ul{flex-wrap:wrap}
+            .flow li,.flow li::before,.status__dot::after{animation:none}
+            .carousel__track{scroll-behavior:auto}
+        }
+
+        :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+    </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><span></span></div>
+
+<header class="nav">
+    <div class="container nav__in">
+        <a class="nav__brand" href="#top">Dorothy James</a>
+        <button class="nav__toggle" aria-expanded="false" aria-controls="menu">Menu</button>
+        <nav id="menu" class="nav__links" aria-label="Primary">
+            <a href="#work">Work</a>
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#contact">Contact</a>
+            <a class="btn btn--primary" href="#contact">Let's Talk</a>
+        </nav>
+    </div>
+</header>
+
+<main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+        <canvas id="dots" aria-hidden="true"></canvas>
+        <div class="container hero__in">
+            <div class="hero__copy">
+                <a class="status" href="#contact"><span class="status__dot" aria-hidden="true"></span>Open to opportunities<span class="status__go">Say hello</span></a>
+                <p class="hero__name">DOROTHY JAMES</p>
+                <p class="hero__role">AI ENGINEER</p>
+                <p class="hero__tags">BACKEND / AI SYSTEMS / SOFTWARE</p>
+                <h1 id="hero-title">Build with purpose. Engineer with evidence.</h1>
+                <p class="lead">Emerging AI Engineer focused on building backend systems and AI-powered applications that solve practical problems.</p>
+                <div class="actions">
+                    <a class="btn btn--primary" href="#work">View My Work</a>
+                    <a class="btn btn--secondary" href="[GitHub URL]">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="roles" aria-labelledby="roles-title">
+        <div class="container"><h2 class="roles__label" id="roles-title">Open to roles such as</h2></div>
+        <div class="marquee"><div class="marquee__track"><ul><li>AI Engineer</li><li>Backend Engineer</li><li>Software Engineer</li><li>LLM Application Developer</li><li>AI Integration Engineer</li><li>API Developer</li><li>Python Developer</li><li>Associate AI Engineer</li><li>RAG Developer</li><li>Applied AI Engineer</li></ul><ul aria-hidden="true"><li>AI Engineer</li><li>Backend Engineer</li><li>Software Engineer</li><li>LLM Application Developer</li><li>AI Integration Engineer</li><li>API Developer</li><li>Python Developer</li><li>Associate AI Engineer</li><li>RAG Developer</li><li>Applied AI Engineer</li></ul></div></div>
+    </section>
+
+    <section class="section" id="work" aria-labelledby="work-title">
+        <div class="container">
+            <div class="head">
+                <h2 id="work-title">Selected Work</h2>
+                <div>
+                    <p>A selection of projects that demonstrate what I have learned, built and shipped.</p>
+                    <p class="note">Demo projects. Replace with your project.</p>
+                </div>
+            </div>
+            <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Selected projects">
+                <ul class="carousel__track" id="track" tabindex="0" aria-label="Projects, use arrow keys to scroll">
+                    <li class="card slide" role="group" aria-roledescription="slide" aria-label="1 of 6"><h3>AI Support Assistant</h3>
+                        <p><strong>Problem.</strong> Support teams answer the same questions repeatedly.</p><p><strong>Built.</strong> A chat service that answers from a company help centre.</p><p><strong>Stack.</strong> Python, FastAPI, PostgreSQL</p><p><strong>AI component.</strong> LLM API with retrieval over help articles.</p>
+                        <p class="links"><a href="[GitHub URL]">GitHub, AI Support Assistant</a><a href="[Live Demo URL]">Live demo, AI Support Assistant</a></p></li>
+                    <li class="card slide" role="group" aria-roledescription="slide" aria-label="2 of 6"><h3>Backend API Platform</h3>
+                        <p><strong>Problem.</strong> Small teams need a secure, documented API to build on.</p><p><strong>Built.</strong> A REST API with authentication, roles and tests.</p><p><strong>Stack.</strong> Python, FastAPI, PostgreSQL, Docker</p><p><strong>AI component.</strong> An endpoint that summarises records with an LLM API.</p>
+                        <p class="links"><a href="[GitHub URL]">GitHub, Backend API Platform</a><a href="[Live Demo URL]">Live demo, Backend API Platform</a></p></li>
+                    <li class="card slide" role="group" aria-roledescription="slide" aria-label="3 of 6"><h3>Document Intelligence Tool</h3>
+                        <p><strong>Problem.</strong> Finding facts inside long PDFs is slow.</p><p><strong>Built.</strong> An upload and question flow with cited answers.</p><p><strong>Stack.</strong> Python, FastAPI, MongoDB</p><p><strong>AI component.</strong> RAG pipeline with embeddings and an LLM API.</p>
+                        <p class="links"><a href="[GitHub URL]">GitHub, Document Intelligence Tool</a><a href="[Live Demo URL]">Live demo, Document Intelligence Tool</a></p></li>
+                    <li class="card slide" role="group" aria-roledescription="slide" aria-label="4 of 6"><h3>Meeting Notes Summariser</h3>
+                        <p><strong>Problem.</strong> Teams lose action items after calls.</p><p><strong>Built.</strong> Upload a transcript, get a summary and a task list.</p><p><strong>Stack.</strong> Python, FastAPI, MongoDB</p><p><strong>AI component.</strong> LLM API returning structured JSON.</p>
+                        <p class="links"><a href="[GitHub URL]">GitHub, Meeting Notes Summariser</a><a href="[Live Demo URL]">Live demo, Meeting Notes Summariser</a></p></li>
+                    <li class="card slide" role="group" aria-roledescription="slide" aria-label="5 of 6"><h3>Semantic Search API</h3>
+                        <p><strong>Problem.</strong> Keyword search misses results that mean the same thing.</p><p><strong>Built.</strong> A search endpoint over a product catalogue.</p><p><strong>Stack.</strong> Python, FastAPI, PostgreSQL</p><p><strong>AI component.</strong> Embeddings with vector similarity search.</p>
+                        <p class="links"><a href="[GitHub URL]">GitHub, Semantic Search API</a><a href="[Live Demo URL]">Live demo, Semantic Search API</a></p></li>
+                    <li class="card slide" role="group" aria-roledescription="slide" aria-label="6 of 6"><h3>Data Pipeline Service</h3>
+                        <p><strong>Problem.</strong> Messy CSV uploads break reports.</p><p><strong>Built.</strong> A service that validates, cleans and loads uploaded files.</p><p><strong>Stack.</strong> Python, PostgreSQL, Docker</p><p><strong>AI component.</strong> LLM API that suggests fixes for rows that fail validation.</p>
+                        <p class="links"><a href="[GitHub URL]">GitHub, Data Pipeline Service</a><a href="[Live Demo URL]">Live demo, Data Pipeline Service</a></p></li>
+                </ul>
+                <div class="carousel__bar">
+                    <p class="carousel__count" id="cur" aria-live="polite">1 to 3 of 6</p>
+                    <div class="carousel__progress" aria-hidden="true"><span id="prog"></span></div>
+                    <div class="carousel__btns">
+                        <button class="btn btn--secondary" id="prev" type="button" aria-label="Previous project"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg></button>
+                        <button class="btn btn--secondary" id="next" type="button" aria-label="Next project"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bridge" aria-hidden="true"><canvas></canvas></div>
+    </section>
+
+    <section class="section section--tint" id="case-study" aria-labelledby="cs-title">
+        <div class="container">
+            <div class="head">
+                <h2 id="cs-title">Featured Case Study</h2>
+                <div>
+                    <p>AI Support Assistant: a chat service that answers from approved help articles.</p>
+                    <p class="note">Example content. Replace with your project.</p>
+                </div>
+            </div>
+            <div class="bento">
+                <article class="b b--12">
+                    <h3>Architecture</h3>
+                    <ol class="flow" aria-label="Request flow: User, Frontend, Backend API, AI Service, Database"><li style="--i:0">User</li><li style="--i:1">Frontend</li><li style="--i:2">Backend API</li><li style="--i:3">AI Service</li><li style="--i:4">Database</li></ol>
+                    <p class="note">Example architecture. Replace with your own.</p>
+                </article>
+                <article class="b b--6 b--lead"><h3>Problem</h3><p>Support staff spent hours on repeat questions, and answers changed from person to person.</p></article>
+                <article class="b b--6 b--lead"><h3>Solution</h3><p>A chat assistant that answers from approved help articles and shows which one it used.</p></article>
+                <article class="b"><h3>AI component</h3><p>Articles are split into chunks and embedded. The closest chunks go to an LLM API with a prompt that limits answers to that context.</p></article>
+                <article class="b"><h3>My contribution</h3><p>Designed the API, wrote the retrieval step, wrote the prompts and added tests.</p></article>
+                <article class="b"><h3>Challenges</h3><p>Stopping made-up answers. I added a rule to reply "I do not know" when no article matched.</p></article>
+                <article class="b"><h3>Technology</h3><ul class="chips"><li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Docker</li><li>LLM API</li><li>HTML</li></ul></article>
+                <article class="b b--8 b--dark"><h3>Outcome</h3><p>A working demo with cited answers. Replace with a result you measured.</p>
+                    <p class="links links--row"><a href="[GitHub URL]">GitHub, case study repository</a><a href="[Live Demo URL]">Live demo, case study</a></p></article>
+            </div>
+        </div>
+        <div class="bridge" aria-hidden="true"><canvas></canvas></div>
+    </section>
+
+    <section class="section" id="skills" aria-labelledby="skills-title">
+        <div class="container">
+            <div class="head">
+                <h2 id="skills-title">Technical Skills</h2>
+                <p class="note">List only what you have actually used.</p>
+            </div>
+            <div class="cards cards--4">
+                <div class="card"><h3>Backend</h3><ul><li>Python</li><li>FastAPI</li><li>REST APIs</li><li>Authentication</li></ul></div>
+                <div class="card"><h3>AI Engineering</h3><ul><li>LLM APIs</li><li>Prompt Engineering</li><li>RAG</li><li>AI Integrations</li></ul></div>
+                <div class="card"><h3>Databases</h3><ul><li>PostgreSQL</li><li>MongoDB</li></ul></div>
+                <div class="card"><h3>Tools and Deployment</h3><ul><li>Git</li><li>GitHub</li><li>Docker</li><li>Cloud / Deployment</li></ul></div>
+            </div>
+        </div>
+        <div class="bridge" aria-hidden="true"><canvas></canvas></div>
+    </section>
+
+    <section class="section section--tint" id="approach" aria-labelledby="approach-title">
+        <div class="container">
+            <div class="head">
+                <h2 id="approach-title">Engineering Approach</h2>
+                <p>I focus on understanding the problem first, designing a practical solution, building with maintainability in mind, and improving based on what I learn.</p>
+            </div>
+            <ol class="steps steps--6">
+                <li>Understand</li><li>Design</li><li>Build</li><li>Test</li><li>Deploy</li><li>Improve</li>
+            </ol>
+        </div>
+        <div class="bridge" aria-hidden="true"><canvas></canvas></div>
+    </section>
+
+    <section class="section" id="about" aria-labelledby="about-title">
+        <div class="container">
+            <div class="head">
+                <h2 id="about-title">About and Learning Journey</h2>
+                <p>I am an emerging AI Engineer building a foundation across backend development, APIs, databases and AI-powered systems. Through the Mastering Backend AI Engineering Bootcamp, I have worked on projects that have helped me understand how software systems and AI capabilities can work together.</p>
+            </div>
+            <ol class="steps steps--4">
+                <li><h3>Before</h3><p>What I knew: [replace with your starting point].</p></li>
+                <li><h3>Bootcamp</h3><p>What I learned: [replace with your key lessons].</p></li>
+                <li><h3>Projects</h3><p>What I built: [replace with your projects].</p></li>
+                <li><h3>Next</h3><p>What I am developing: [replace with your goals].</p></li>
+            </ol>
+        </div>
+        <div class="bridge" aria-hidden="true"><canvas></canvas></div>
+    </section>
+
+    <section class="section section--tint" id="github" aria-labelledby="gh-title">
+        <div class="container">
+            <div class="head">
+                <h2 id="gh-title">Code behind the work.</h2>
+                <div>
+                    <p>Explore the repositories, documentation and implementation behind my projects.</p>
+                    <p class="actions"><a class="btn btn--primary" href="[GitHub URL]">View GitHub</a></p>
+                </div>
+            </div>
+            <div class="cards">
+                <a class="card card--link" href="[GitHub URL]"><h3>ai-support-assistant</h3><p>Chat assistant that answers from help articles.</p><p class="meta">Python</p></a>
+                <a class="card card--link" href="[GitHub URL]"><h3>backend-api-platform</h3><p>Authenticated REST API with tests and Docker setup.</p><p class="meta">Python</p></a>
+                <a class="card card--link" href="[GitHub URL]"><h3>document-intelligence-tool</h3><p>Question answering over uploaded PDFs with RAG.</p><p class="meta">Python</p></a>
+            </div>
+        </div>
+        <div class="bridge" aria-hidden="true"><canvas></canvas></div>
+    </section>
+
+    <section class="section" id="bootcamp" aria-labelledby="bc-title">
+        <div class="container">
+            <div class="bootcamp">
+                <h2 id="bc-title">MASTERING BACKEND, AI ENGINEERING BOOTCAMP</h2>
+                <ul class="inline"><li>AI Engineering</li><li>Backend Development</li><li>Project-Based Learning</li></ul>
+            </div>
+        </div>
+        <div class="bridge" aria-hidden="true"><canvas></canvas></div>
+    </section>
+
+    <section class="section section--tint" id="contact" aria-labelledby="contact-title">
+        <div class="container">
+            <div class="head">
+                <h2 id="contact-title">Let's build something useful.</h2>
+                <div>
+                    <p>I'm open to opportunities, collaborations and conversations around backend and AI engineering.</p>
+                    <p class="actions">
+                        <a class="btn btn--primary" href="mailto:email@example.com">Get in Touch</a>
+                        <a class="btn btn--secondary" href="[LinkedIn URL]">LinkedIn</a>
+                        <a class="btn btn--secondary" href="[GitHub URL]">GitHub</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <canvas id="ripples" aria-hidden="true"></canvas>
+    <div class="container footer__in">
+        <p><strong>Dorothy James</strong>, AI Engineer</p>
+        <p class="footer__links"><a href="[GitHub URL]">GitHub</a><a href="[LinkedIn URL]">LinkedIn</a><a href="mailto:email@example.com">Email</a></p>
+        <p>2026</p>
+    </div>
+</footer>
+<script>
+    (function () {
+        'use strict';
+        var $ = function (s) { return document.querySelector(s); };
+        var all = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+        var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var touch = matchMedia('(hover: none)').matches;
+        var G = [196, 196, 196], D = [15, 81, 50];
+        var dpr = function () { return Math.min(window.devicePixelRatio || 1, 2); };
+
+        function dot(c, x, y, r, g, a) {
+            var k = function (i) { return Math.round(G[i] + (D[i] - G[i]) * g); };
+            c.globalAlpha = a; c.fillStyle = 'rgb(' + k(0) + ',' + k(1) + ',' + k(2) + ')';
+            c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fill();
+        }
+
+        // Mobile menu
+        var toggle = $('.nav__toggle'), menu = $('#menu');
+        function setMenu(o) { menu.classList.toggle('open', o); toggle.setAttribute('aria-expanded', String(o)); }
+        toggle.addEventListener('click', function () { setMenu(!menu.classList.contains('open')); });
+        menu.addEventListener('click', function (e) { if (e.target.tagName === 'A') setMenu(false); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setMenu(false); });
+
+        // Scroll reveal
+        if ('IntersectionObserver' in window && !reduced) {
+            var io = new IntersectionObserver(function (es) {
+                es.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+            }, { threshold: 0.12 });
+            all('.section .head, .cards .card, .b, .carousel, .steps, .bootcamp').forEach(function (el) {
+                el.classList.add('reveal'); io.observe(el);
+            });
+        }
+
+        // Shared dot-field canvas: sizing, visibility, pause and resume
+        function field(canvas, host, textEl, frame) {
+            var f = { ctx: canvas.getContext('2d'), w: 0, h: 0, fade: null, vis: true }, run = false, raf = 0, rt;
+            f.fadeAt = function (x, y) {
+                var a = f.fade; if (!a) return 1;
+                var dx = Math.max(a.l - x, 0, x - a.r), dy = Math.max(a.t - y, 0, y - a.b);
+                return 0.12 + 0.88 * Math.min(Math.sqrt(dx * dx + dy * dy) / 90, 1);
+            };
+            function loop(t) {
+                if (!run) return;
+                if (frame(f, t) === false) { run = false; return; }
+                raf = requestAnimationFrame(loop);
+            }
+            function halt() { run = false; cancelAnimationFrame(raf); }
+            f.wake = function () { if (reduced || run || !f.vis || document.hidden) return; run = true; raf = requestAnimationFrame(loop); };
+            f.size = function () {
+                var d = dpr(), hr = host.getBoundingClientRect(), c = textEl.getBoundingClientRect();
+                f.w = host.clientWidth; f.h = host.clientHeight;
+                canvas.width = f.w * d; canvas.height = f.h * d; f.ctx.setTransform(d, 0, 0, d, 0, 0);
+                f.fade = { l: c.left - hr.left, t: c.top - hr.top, r: c.right - hr.left, b: c.bottom - hr.top };
+                frame(f, performance.now());
+            };
+            new IntersectionObserver(function (e) { f.vis = e[0].isIntersecting; f.vis ? f.wake() : halt(); }).observe(host);
+            document.addEventListener('visibilitychange', function () { document.hidden ? halt() : f.wake(); });
+            window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(f.size, 120); });
+            f.size();
+            return f;
+        }
+
+        // Hero: wave plus cursor push
+        var hero = $('.hero'), hp = { x: -9999, y: -9999, tx: -9999, ty: -9999, on: false }, GAP = 28, R = 140;
+        var hf = field($('#dots'), hero, $('.hero__copy'), function (f, t) {
+            var c = f.ctx, s = reduced ? 0 : t * 0.001, cols = Math.ceil(f.w / GAP) + 1, rows = Math.ceil(f.h / GAP) + 1, i, j;
+            c.clearRect(0, 0, f.w, f.h);
+            if (touch && !reduced) { hp.x = f.w * (0.5 + 0.4 * Math.sin(s * 0.35)); hp.y = f.h * (0.5 + 0.3 * Math.sin(s * 0.5 + 1)); }
+            else { hp.x += (hp.tx - hp.x) * 0.12; hp.y += (hp.ty - hp.y) * 0.12; }
+            for (i = 0; i < cols; i++) for (j = 0; j < rows; j++) {
+                var bx = i * GAP, by = j * GAP, x = bx + Math.cos(j * 0.35 + s * 0.7) * 2, y = by + Math.sin(i * 0.35 + s * 0.8) * 3 + Math.cos(j * 0.3 + s * 0.6) * 2;
+                var n = 0, dx = x - hp.x, dy = y - hp.y, d = Math.sqrt(dx * dx + dy * dy);
+                if (!reduced && d < R) { n = 1 - d / R; n = n * n * (3 - 2 * n); x += dx / (d || 1) * n * 14; y += dy / (d || 1) * n * 14; }
+                dot(c, x, y, 1.4 + n * 1.8, n > 0.35 ? (n - 0.35) / 0.65 : 0, f.fadeAt(bx, by));
+            }
+            c.globalAlpha = 1;
+        });
+        hero.addEventListener('pointermove', function (e) {
+            if (e.pointerType === 'touch') return;
+            var r = hero.getBoundingClientRect(); hp.tx = e.clientX - r.left; hp.ty = e.clientY - r.top;
+            if (!hp.on) { hp.x = hp.tx; hp.y = hp.ty; hp.on = true; }
+        });
+        hero.addEventListener('pointerleave', function () { hp.tx = hp.ty = -9999; hp.on = false; });
+
+        // Footer: ripples that travel outward from the cursor or a tap
+        var foot = $('.footer'), rip = [], last = { x: -999, y: -999 };
+        var ff = field($('#ripples'), foot, $('.footer__in'), function (f, t) {
+            var c = f.ctx, S = 24, cols = Math.ceil(f.w / S) + 1, rows = Math.ceil(f.h / S) + 1, i, j, q;
+            c.clearRect(0, 0, f.w, f.h);
+            rip = rip.filter(function (r) { return t - r.t < 3200; });
+            for (i = 0; i < cols; i++) for (j = 0; j < rows; j++) {
+                var x = i * S, y = j * S, k = 0, ox = 0, oy = 0;
+                for (q = 0; q < rip.length; q++) {
+                    var r = rip[q], age = (t - r.t) / 1000, dx = x - r.x, dy = y - r.y, d = Math.sqrt(dx * dx + dy * dy) || 1, off = d - age * 240;
+                    var e = Math.exp(-off * off / 1800) * r.a * Math.max(0, 1 - age / 3);
+                    k += e; ox += dx / d * e * 7; oy += dy / d * e * 7;
+                }
+                k = Math.min(k, 1);
+                dot(c, x + ox, y + oy, 1.4 + 2.4 * k, k > 0.3 ? (k - 0.3) / 0.7 : 0, f.fadeAt(x, y));
+            }
+            c.globalAlpha = 1;
+            return rip.length > 0;
+        });
+        function spawn(x, y, a) {
+            if (reduced) return;
+            rip.push({ x: x, y: y, t: performance.now(), a: a }); if (rip.length > 8) rip.shift(); ff.wake();
+        }
+        function local(e) { var r = foot.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+        foot.addEventListener('pointermove', function (e) {
+            if (e.pointerType === 'touch') return;
+            var p = local(e), dx = p.x - last.x, dy = p.y - last.y;
+            if (dx * dx + dy * dy > 4900) { last = p; spawn(p.x, p.y, 0.7); }
+        });
+        foot.addEventListener('pointerdown', function (e) { var p = local(e); spawn(p.x, p.y, 1.1); });
+        if (touch && !reduced) setInterval(function () { if (ff.vis) spawn(Math.random() * ff.w, Math.random() * ff.h, 0.8); }, 2800);
+
+        // Section bridges: a pulse of dots follows scroll position. Also the progress line.
+        var prog = $('.progress span'), pend = false;
+        var bridges = all('.bridge').map(function (el) {
+            var cv = el.firstElementChild; return { el: el, cv: cv, c: cv.getContext('2d'), w: 0, h: 0, vis: false };
+        });
+        function bsize(b) {
+            var d = dpr(); b.w = b.el.clientWidth; b.h = b.el.clientHeight;
+            b.cv.width = b.w * d; b.cv.height = b.h * d; b.c.setTransform(d, 0, 0, d, 0, 0);
+        }
+        function bdraw(b) {
+            var r = b.el.getBoundingClientRect(), vh = window.innerHeight, i;
+            var p = Math.min(Math.max((vh - r.top) / (vh + r.height), 0), 1), px = reduced ? -9999 : p * b.w;
+            b.c.clearRect(0, 0, b.w, b.h);
+            for (i = 0; i * 16 < b.w + 16; i++) {
+                var x = i * 16 + 8, dx = x - px, g = Math.exp(-dx * dx / 24200);
+                dot(b.c, x, b.h / 2 - g * 8, 1.2 + 2.6 * g, g > 0.25 ? (g - 0.25) / 0.75 : 0, 1);
+            }
+            b.c.globalAlpha = 1;
+        }
+        function sched() {
+            if (pend) return; pend = true;
+            requestAnimationFrame(function () {
+                pend = false;
+                var max = document.documentElement.scrollHeight - window.innerHeight;
+                prog.style.transform = 'scaleX(' + (max > 0 ? window.scrollY / max : 0) + ')';
+                bridges.forEach(function (b) { if (b.vis) bdraw(b); });
+            });
+        }
+        var bio = new IntersectionObserver(function (es) {
+            es.forEach(function (e) { bridges.forEach(function (b) { if (b.el === e.target) b.vis = e.isIntersecting; }); });
+            sched();
+        }, { rootMargin: '100px' });
+        bridges.forEach(function (b) { bsize(b); bio.observe(b.el); });
+        window.addEventListener('scroll', sched, { passive: true });
+        window.addEventListener('resize', function () { bridges.forEach(bsize); sched(); });
+        sched();
+
+        // Work carousel
+        var tr = $('#track'), prev = $('#prev'), next = $('#next'), cur = $('#cur'), pg = $('#prog'), total = tr.children.length;
+        function step() {
+            var gap = parseFloat(getComputedStyle(tr).columnGap) || 0;
+            return tr.children[0].getBoundingClientRect().width + gap;
+        }
+        function upd() {
+            var s = step(), vis = Math.max(1, Math.round(tr.clientWidth / s));
+            var first = Math.min(Math.round(tr.scrollLeft / s) + 1, total - vis + 1), lastN = first + vis - 1;
+            cur.textContent = vis > 1 ? first + ' to ' + lastN + ' of ' + total : first + ' of ' + total;
+            pg.style.transform = 'scaleX(' + lastN / total + ')';
+            prev.disabled = tr.scrollLeft < 4;
+            next.disabled = tr.scrollLeft > tr.scrollWidth - tr.clientWidth - 4;
+        }
+        function go(dir) { tr.scrollBy({ left: dir * step(), behavior: reduced ? 'auto' : 'smooth' }); }
+        prev.addEventListener('click', function () { go(-1); });
+        next.addEventListener('click', function () { go(1); });
+        tr.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+        });
+        tr.addEventListener('scroll', upd, { passive: true });
+        window.addEventListener('resize', upd);
+        upd();
+    })();
+</script>
+</body>
+</html>

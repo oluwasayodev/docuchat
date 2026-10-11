@@ -1,15 +1,15 @@
 import {EventOptions, IEventBus} from "./eventBus.interface";
 import {EventMap} from "./event.types";
 import {EventEmitter} from "node:events";
-import {logger} from "../lib/logger";
-import {injectable, singleton} from "tsyringe";
+import {inject, injectable, singleton} from "tsyringe";
+import {ILogger} from "../logging/logger.interface";
 
 @injectable()
 export class InMemoryEventBus implements IEventBus {
 
     private emitter = new EventEmitter();
 
-    constructor() {
+    constructor(@inject("ILogger") private readonly logger: ILogger) {
         this.emitter.setMaxListeners(25);
     }
     async publish<K extends keyof EventMap>(event: K, payload: EventMap[K], options?: EventOptions): Promise<void> {
@@ -21,7 +21,7 @@ export class InMemoryEventBus implements IEventBus {
             try {
                 await listener(data);
             } catch (error) {
-                logger.error(`[InMemoryEventBus] Error handling ${String(event)}: ${error}`);
+                this.logger.error(`[InMemoryEventBus] Error handling ${String(event)}: ${error}`);
             }
         });
     }

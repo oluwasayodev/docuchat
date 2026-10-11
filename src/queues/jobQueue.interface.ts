@@ -16,7 +16,7 @@ export interface QueuedJob {
 export interface JobPayloadMap {
     "send-welcome-email": {userId: string; email: string};
     "send-password-reset-email": {to: string; name: string; resetLink: string};
-    "process-document": {documentId: string};
+    "process-document": {documentId: string, correlationId?: string};
     "retry-exhausted": {
         originalQueue: string;
         originalJobName: string;

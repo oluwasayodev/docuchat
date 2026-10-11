@@ -2,24 +2,25 @@ import {ILogger} from "./logger.interface";
 import {inject, injectable} from "tsyringe";
 import winston from 'winston'
 import {AppConfig} from "../lib/config";
+import {formatConsoleLine} from "./consoleFormat";
 
 
 @injectable()
 export class WinstonLogger implements ILogger {
     private logger: winston.Logger;
-    private readonly appConfig: AppConfig;
+    private readonly config: AppConfig;
 
     constructor(@inject(AppConfig) appConfig: AppConfig, loggerInstance?: winston.Logger) {
-        this.appConfig = appConfig;
+        this.config = appConfig;
         this.logger = loggerInstance || winston.createLogger({
-            level: this.appConfig.logLevel,
-            format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+            level: this.config.logLevel,
+            format: this.buildFormat(),
             transports: [new winston.transports.Console()]
         })
     }
 
     child(bindings: Record<string, any>): ILogger {
-        return new WinstonLogger(this.appConfig, this.logger.child(bindings));
+        return new WinstonLogger(this.config, this.logger.child(bindings));
     }
 
     debug(message: string, meta?: Record<string, any>): void {
@@ -40,4 +41,11 @@ export class WinstonLogger implements ILogger {
     }
 
 
+    private buildFormat() {
+        if (this.config.env === "production") {
+            return winston.format.combine(winston.format.timestamp(), winston.format.json());
+        }
+
+        return winston.format.printf(info => formatConsoleLine(info as Record<string, any>));
+    }
 }

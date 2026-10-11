@@ -1,11 +1,10 @@
 import {NextFunction, Request, Response} from "express";
 import {BadRequestException, HttpError, PayloadTooLargeError} from "../errors/http.error";
-import {logger} from "../lib/logger";
 import multer from "multer";
 import {container} from "../container";
 import {AppConfig} from "../lib/config";
-import {ValidationError} from "class-validator";
 import {ValidateError} from "@tsoa/runtime";
+import {ILogger} from "../logging/logger.interface";
 
 
 export const globalErrorHandler = (
@@ -46,6 +45,7 @@ export const globalErrorHandler = (
         return
     }
 
+    const logger = container.resolve<ILogger>("ILogger");
     logger.error(`Unhandled error occurred: ${err.message}`);
 
     res.status(500).json({

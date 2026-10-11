@@ -23,6 +23,7 @@ import {error, query} from "winston";
 import {AppConfig} from "../lib/config";
 import {IEmbeddingModelFactory} from "../models/embedding/embeddingModel.factory";
 import {IUsageLogRepository} from "../repositories/usageLogRepository.interface";
+import {currentLogContext} from "../logging/logContext";
 
 
 @injectable()
@@ -114,7 +115,10 @@ export class DocumentService implements IDocumentService {
         }
 
         try {
-            await this.jobQueue.addJob(QUEUES.DOCUMENTS.jobs.PROCESS_DOCUMENT, {documentId: document.id})
+            await this.jobQueue.addJob(QUEUES.DOCUMENTS.jobs.PROCESS_DOCUMENT, {
+                documentId: document.id,
+                correlationId: currentLogContext()?.correlationId
+            })
         } catch (error) {
             await this.documentRepository.updateProcessing(document.id, {
                 status: "FAILED",
@@ -181,7 +185,10 @@ export class DocumentService implements IDocumentService {
         })
 
         try {
-            await this.jobQueue.addJob(QUEUES.DOCUMENTS.jobs.PROCESS_DOCUMENT, {documentId: document.id});
+            await this.jobQueue.addJob(QUEUES.DOCUMENTS.jobs.PROCESS_DOCUMENT, {
+                documentId: document.id,
+                correlationId: currentLogContext()?.correlationId
+            });
         } catch (error) {
             await this.documentRepository.updateProcessing(document.id, {
                 status: "FAILED",

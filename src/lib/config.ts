@@ -326,6 +326,34 @@ export class AppConfig {
     @IsOptional()
     readonly documentTokenEncoding: TokenEncoding  = "cl100k_base";
 
+    @Expose({name: "QUEUE_LOCK_DURATION_MS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly queueLockDurationMs: number  = 120_000;
+
+    @Expose({name: "QUEUE_MAX_STALLED"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly queueMaxStallCount: number  = 1;
+
+    @Expose({name: "INGEST_STALL_THRESHOLD_MS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly ingestStallThresholdMs: number  = 300_000;
+
+    @Expose({name: "STALL_CHECK_INTERVAL_MS"})
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    readonly stallCheckIntervalMs: number  = 30_000;
+
 
     get isProduction(): boolean {
         return this.env === NodeEnv.PRODUCTION;

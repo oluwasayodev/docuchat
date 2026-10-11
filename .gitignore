@@ -147,3 +147,5 @@ vite.config.ts.timestamp-*
 uploads/
 docs/
 swagger.json
+
+scripts/

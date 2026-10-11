@@ -1,6 +1,7 @@
 import {JwtPayload} from "jsonwebtoken";
 import {RoleName} from "../constants/roles";
 import {PermissionAction} from "../constants/permissions";
+import {ILogger} from "../logging/logger.interface";
 
 
 export interface UserTokenPayload extends JwtPayload {
@@ -14,6 +15,8 @@ declare global {
     namespace Express {
         interface Request {
             user?: UserTokenPayload;
+            correlationId?: string;
+            log?: ILogger;
         }
     }
 }

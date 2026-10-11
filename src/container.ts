@@ -1,4 +1,4 @@
-import {container} from "tsyringe";
+import {container, instanceCachingFactory} from "tsyringe";
 import {PrismaClient} from "@prisma/client";
 import {PrismaUserRepository} from "./repositories/prismaUserRepository";
 import {UserService} from "./services/userService";
@@ -56,6 +56,7 @@ import {IChatService} from "./services/chatService.interface";
 import {ChatService} from "./services/chat.service";
 import {IConversationService} from "./services/conversationService.interface";
 import {ConversationService} from "./services/conversation.service";
+import {ContextAwareLogger} from "./logging/contextAwareLogger";
 
 
 container.register("IAuthProvider", {useClass: GoogleAuthProvider})
@@ -89,7 +90,10 @@ container.registerSingleton("IDocumentParser", TextDocumentParser);
 container.registerSingleton("IDocumentParser", PdfDocumentParser);
 container.registerSingleton("IDocumentParser", DocxDocumentParser);
 container.register<IDocumentParsers>("IDocumentParsers", {useClass: DocumentParserFactory})
-container.register<ILogger>("ILogger", {useFactory: loggerFactory});
+// container.register<ILogger>("ILogger", {useFactory: loggerFactory});
+container.register<ILogger>("ILogger", {
+    useFactory: instanceCachingFactory<ILogger>(c => new ContextAwareLogger(loggerFactory(c)))
+})
 container.register<ICacheService>("ICacheService", {useFactory: cacheFactory});
 container.register(AppConfig, {useValue: config});
 container.registerSingleton<IDocumentChunker>("IDocumentChunker", DocumentChunker);
