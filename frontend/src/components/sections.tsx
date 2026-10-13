@@ -162,13 +162,29 @@ export function SelectedWork() {
                     </li>
                   ))}
                 </ul>
-                {item.href ? (
-                  <a
-                    href={item.href}
-                    className="link-underline mt-6 inline-block font-mono text-xs uppercase tracking-[0.18em] text-ink"
-                  >
-                    {item.linkLabel ?? "Read case study"} ↗
-                  </a>
+                {item.links && item.links.length > 0 ? (
+                  <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+                    {item.links.map((link) => {
+                      const external = /^https?:\/\//.test(link.href);
+                      const className =
+                        "link-underline inline-block font-mono text-xs uppercase tracking-[0.18em] text-ink";
+                      return external ? (
+                        <a
+                          key={link.label}
+                          href={link.href}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className={className}
+                        >
+                          {link.label} ↗
+                        </a>
+                      ) : (
+                        <Link key={link.label} href={link.href} className={className}>
+                          {link.label} →
+                        </Link>
+                      );
+                    })}
+                  </div>
                 ) : null}
               </div>
               <div className="md:border-l md:border-line md:pl-6">
@@ -201,7 +217,7 @@ export function Stack() {
       <h2 className="font-serif text-3xl text-ink md:text-4xl">
         What I reach for.
       </h2>
-      <div className="mt-10 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
         {stack.map((group) => (
           <div key={group.group}>
             <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
@@ -260,8 +276,14 @@ export function SiteFooter() {
         <p className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted">
           {profile.name} — {profile.location}
         </p>
-        <p className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted">
-          Set in Fraunces, Geist &amp; Geist Mono · Built with Next.js
+        <p className="font-mono text-[0.7rem] tracking-[0.16em] text-muted">
+          <span className="uppercase">Open to remote roles</span> ·{" "}
+          <a
+            href={`mailto:${profile.email}`}
+            className="link-underline text-ink"
+          >
+            {profile.email} ↗
+          </a>
         </p>
       </div>
     </footer>

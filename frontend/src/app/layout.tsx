@@ -24,15 +24,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://example.com"),
   title: {
-    default: "Oluwasayo Akinkunmi — Backend & AI Engineer",
+    default: "Oluwasayo Akinkunmi — Backend, Data & AI Engineer",
     template: "%s — Oluwasayo Akinkunmi",
   },
   description:
-    "Backend and AI engineer building retrieval, ingestion, and observability systems that make documents answerable.",
+    "Backend, data, and AI engineer building pipelines, services, and retrieval systems that hold up in production.",
   openGraph: {
-    title: "Oluwasayo Akinkunmi — Backend & AI Engineer",
+    title: "Oluwasayo Akinkunmi — Backend, Data & AI Engineer",
     description:
-      "Backend and AI engineer building retrieval, ingestion, and observability systems that make documents answerable.",
+      "Backend, data, and AI engineer building pipelines, services, and retrieval systems that hold up in production.",
     type: "website",
     siteName: "Oluwasayo Akinkunmi",
   },
